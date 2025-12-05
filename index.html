@@ -281,8 +281,6 @@
          <div><label class="block text-sm font-medium text-gray-700 mb-2">Telefono</label> <input type="tel" id="company-phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="+39 02 1234567">
          </div>
         </div>
-        <div><label class="block text-sm font-medium text-gray-700 mb-2">Referente Aziendale</label> <input type="text" id="company-contact" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nome Cognome">
-        </div>
         <div class="flex space-x-3 pt-4"><button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"> Salva Azienda </button> <button type="button" onclick="closeCompanyModal()" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"> Annulla </button>
         </div>
        </form>
@@ -485,7 +483,7 @@
         if (error) throw error;
         showAPIStatus('success', '✅ Connessione riuscita!');
       } catch (error) {
-        showAPIStatus('error', '❌ Test fallito: ' + error.message);
+        showAPIStatus('error', '����� Test fallito: ' + error.message);
       }
     }
 
@@ -598,7 +596,7 @@
         email: document.getElementById('user-email').value,
         password: document.getElementById('user-password').value,
         role: document.getElementById('user-role').value,
-        company_name: document.getElementById('user-company').value || null
+        company_id: document.getElementById('user-company').value || null
       };
       
       if (supabase) {
@@ -656,7 +654,7 @@
           <td class="px-6 py-4 text-sm font-medium text-gray-900">${user.name}</td>
           <td class="px-6 py-4 text-sm text-gray-600">${user.email}</td>
           <td class="px-6 py-4 text-sm">${roleLabels[user.role]}</td>
-          <td class="px-6 py-4 text-sm text-gray-600">${user.company_name || '-'}</td>
+          <td class="px-6 py-4 text-sm text-gray-600">${user.company_id || '-'}</td>
           <td class="px-6 py-4 text-sm">
             <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-800 font-medium">
               Elimina
@@ -706,8 +704,7 @@
         nis2_category: document.getElementById('company-category').value,
         full_address: document.getElementById('company-address').value,
         email: document.getElementById('company-email').value,
-        phone: document.getElementById('company-phone').value,
-        contact_person: document.getElementById('company-contact').value
+        phone: document.getElementById('company-phone').value
       };
       
       if (supabase) {
@@ -786,7 +783,6 @@
           <div class="space-y-2 text-sm mb-4">
             <p class="text-gray-600"><strong>Settore:</strong> ${company.sector}</p>
             <p class="text-gray-600"><strong>Indirizzo:</strong> ${company.full_address || '-'}</p>
-            <p class="text-gray-600"><strong>Referente:</strong> ${company.contact_person}</p>
             <p class="text-gray-600"><strong>Email:</strong> ${company.email}</p>
             <p class="text-gray-600"><strong>Telefono:</strong> ${company.phone}</p>
           </div>
@@ -842,11 +838,11 @@
       
       companies.forEach(company => {
         const option = document.createElement('option');
-        option.value = company.company_name;
+        option.value = company.id;
         option.textContent = company.company_name;
         select.appendChild(option);
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a940c537676eddb',t:'MTc2NDk0Mjk5OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a94156d0422ed2b',t:'MTc2NDk0MzM3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
