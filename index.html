@@ -189,10 +189,125 @@
         </div>
        </div>
       </div><!-- Recent Activity -->
-      <div class="bg-white rounded-xl shadow-md p-6">
+      <div class="bg-white rounded-xl shadow-md p-6" id="recent-activity-card">
        <h3 class="text-xl font-bold text-gray-800 mb-4">Attività Recenti</h3>
        <div id="recent-activity" class="space-y-3">
         <p class="text-gray-500 text-center py-8">Nessuna attività recente</p>
+       </div>
+      </div><!-- CSIRT Designation Section (CSIRT Role Only) -->
+      <div id="csirt-designation-card" class="hidden mt-8">
+       <div class="bg-white rounded-xl shadow-md p-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">📋 Designazione Referente CSIRT</h3>
+        <form id="csirt-designation-form" class="space-y-8"><!-- Referente Principale -->
+         <div class="border-b border-gray-200 pb-6">
+          <h4 class="text-lg font-semibold text-gray-800 mb-4">👤 Referente Principale</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="csirt-date" class="block text-sm font-medium text-gray-700 mb-2">Data Nomina <span class="text-red-500">*</span></label> <input type="date" id="csirt-date" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="csirt-fullname" class="block text-sm font-medium text-gray-700 mb-2">Nome e Cognome <span class="text-red-500">*</span></label> <input type="text" id="csirt-fullname" required placeholder="es. Mario Rossi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="csirt-cf" class="block text-sm font-medium text-gray-700 mb-2">Codice Fiscale <span class="text-red-500">*</span></label> <input type="text" id="csirt-cf" required placeholder="es. RSSMRA80A01H501Z" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="csirt-email" class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label> <input type="email" id="csirt-email" required placeholder="es. referente@azienda.it" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="csirt-phone" class="block text-sm font-medium text-gray-700 mb-2">Telefono <span class="text-red-500">*</span></label> <input type="tel" id="csirt-phone" required placeholder="es. +39 333 1234567" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+          </div>
+         </div><!-- Punto di Contatto ACN -->
+         <div class="border-b border-gray-200 pb-6">
+          <h4 class="text-lg font-semibold text-gray-800 mb-4">🔗 Punto di Contatto ACN</h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+           <div><label for="acn-name" class="block text-sm font-medium text-gray-700 mb-2">Nome <span class="text-red-500">*</span></label> <input type="text" id="acn-name" required placeholder="es. Marco" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="acn-surname" class="block text-sm font-medium text-gray-700 mb-2">Cognome <span class="text-red-500">*</span></label> <input type="text" id="acn-surname" required placeholder="es. Bianchi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="acn-email" class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label> <input type="email" id="acn-email" required placeholder="es. acn@azienda.it" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+          </div>
+         </div><!-- Primo Sostituto -->
+         <div class="border-b border-gray-200 pb-6">
+          <h4 class="text-lg font-semibold text-gray-800 mb-4">👥 Primo Sostituto Referente</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="sub1-name" class="block text-sm font-medium text-gray-700 mb-2">Nome <span class="text-red-500">*</span></label> <input type="text" id="sub1-name" required placeholder="es. Luigi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="sub1-surname" class="block text-sm font-medium text-gray-700 mb-2">Cognome <span class="text-red-500">*</span></label> <input type="text" id="sub1-surname" required placeholder="es. Verdi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="sub1-email" class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label> <input type="email" id="sub1-email" required placeholder="es. sostituto1@azienda.it" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="sub1-phone" class="block text-sm font-medium text-gray-700 mb-2">Telefono <span class="text-red-500">*</span></label> <input type="tel" id="sub1-phone" required placeholder="es. +39 333 9876543" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+          </div>
+         </div><!-- Secondo Sostituto -->
+         <div class="border-b border-gray-200 pb-6">
+          <h4 class="text-lg font-semibold text-gray-800 mb-4">👥 Secondo Sostituto Referente</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="sub2-name" class="block text-sm font-medium text-gray-700 mb-2">Nome <span class="text-red-500">*</span></label> <input type="text" id="sub2-name" required placeholder="es. Anna" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="sub2-surname" class="block text-sm font-medium text-gray-700 mb-2">Cognome <span class="text-red-500">*</span></label> <input type="text" id="sub2-surname" required placeholder="es. Neri" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="sub2-email" class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label> <input type="email" id="sub2-email" required placeholder="es. sostituto2@azienda.it" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="sub2-phone" class="block text-sm font-medium text-gray-700 mb-2">Telefono <span class="text-red-500">*</span></label> <input type="tel" id="sub2-phone" required placeholder="es. +39 333 5555555" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+          </div>
+         </div><!-- Motivazione Scelta Esterna -->
+         <div><label for="external-reason" class="block text-sm font-medium text-gray-700 mb-2">📝 Motivazione Scelta Esterna (opzionale)</label> <textarea id="external-reason" rows="4" placeholder="Descrivi le motivazioni per cui è stato scelto un referente CSIRT esterno..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+         </div><!-- Submit Button -->
+         <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" id="save-designation-btn" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Designazione </button>
+          <div id="designation-status" class="text-sm font-medium"></div>
+         </div>
+        </form>
+       </div>
+      </div><!-- Network Configuration Card (CSIRT Role Only) -->
+      <div id="network-config-card" class="hidden mt-8">
+       <div class="bg-white rounded-xl shadow-md p-8">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">🌐 Configurazione Rete Aziendale</h3>
+        <form id="network-config-form" class="space-y-8"><!-- Informazioni Generali Rete -->
+         <div class="border-b border-gray-200 pb-6">
+          <h4 class="text-lg font-semibold text-gray-800 mb-4">📡 Informazioni Generali</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="net-topology" class="block text-sm font-medium text-gray-700 mb-2">Topologia di Rete <span class="text-red-500">*</span></label> <select id="net-topology" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Seleziona topologia</option> <option value="star">Stella (Star)</option> <option value="mesh">Mesh</option> <option value="hybrid">Ibrida (Hybrid)</option> <option value="bus">Bus</option> <option value="ring">Anello (Ring)</option> </select>
+           </div>
+           <div><label for="net-size" class="block text-sm font-medium text-gray-700 mb-2">Dimensione Rete <span class="text-red-500">*</span></label> <select id="net-size" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Seleziona dimensione</option> <option value="small">Piccola (&lt; 50 dispositivi)</option> <option value="medium">Media (50-200 dispositivi)</option> <option value="large">Grande (200-1000 dispositivi)</option> <option value="enterprise">Enterprise (&gt; 1000 dispositivi)</option> </select>
+           </div>
+           <div><label for="net-subnets" class="block text-sm font-medium text-gray-700 mb-2">Numero Sottoreti <span class="text-red-500">*</span></label> <input type="number" id="net-subnets" required min="1" placeholder="es. 5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="net-vlans" class="block text-sm font-medium text-gray-700 mb-2">VLAN Configurate</label> <input type="number" id="net-vlans" min="0" placeholder="es. 10" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+          </div>
+         </div><!-- Sicurezza Perimetrale -->
+         <div class="border-b border-gray-200 pb-6">
+          <h4 class="text-lg font-semibold text-gray-800 mb-4">🛡️ Sicurezza Perimetrale</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="firewall-type" class="block text-sm font-medium text-gray-700 mb-2">Tipo Firewall <span class="text-red-500">*</span></label> <select id="firewall-type" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Seleziona tipo</option> <option value="hardware">Hardware Dedicato</option> <option value="software">Software/Virtuale</option> <option value="cloud">Cloud-Based</option> <option value="hybrid">Ibrido</option> </select>
+           </div>
+           <div><label for="firewall-vendor" class="block text-sm font-medium text-gray-700 mb-2">Fornitore Firewall</label> <input type="text" id="firewall-vendor" placeholder="es. Cisco, Fortinet, Palo Alto" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div class="flex items-center"><input type="checkbox" id="has-ids" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"> <label for="has-ids" class="ml-3 text-sm font-medium text-gray-700">IDS/IPS Attivo</label>
+           </div>
+           <div class="flex items-center"><input type="checkbox" id="has-waf" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"> <label for="has-waf" class="ml-3 text-sm font-medium text-gray-700">Web Application Firewall (WAF)</label>
+           </div>
+          </div>
+         </div><!-- Connettività e Backup -->
+         <div class="border-b border-gray-200 pb-6">
+          <h4 class="text-lg font-semibold text-gray-800 mb-4">🔌 Connettività e Ridondanza</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="isp-primary" class="block text-sm font-medium text-gray-700 mb-2">ISP Primario <span class="text-red-500">*</span></label> <input type="text" id="isp-primary" required placeholder="es. TIM, Vodafone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="isp-secondary" class="block text-sm font-medium text-gray-700 mb-2">ISP Secondario (Backup)</label> <input type="text" id="isp-secondary" placeholder="es. Fastweb, Linkem" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div><label for="bandwidth" class="block text-sm font-medium text-gray-700 mb-2">Banda Garantita <span class="text-red-500">*</span></label> <input type="text" id="bandwidth" required placeholder="es. 1 Gbps, 100 Mbps" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+           </div>
+           <div class="flex items-center"><input type="checkbox" id="has-vpn" class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"> <label for="has-vpn" class="ml-3 text-sm font-medium text-gray-700">VPN Aziendale Configurata</label>
+           </div>
+          </div>
+         </div><!-- Note Aggiuntive -->
+         <div><label for="network-notes" class="block text-sm font-medium text-gray-700 mb-2">📝 Note e Configurazioni Aggiuntive</label> <textarea id="network-notes" rows="4" placeholder="Inserisci eventuali note sulla configurazione di rete, sistemi di monitoraggio, SIEM, etc..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+         </div><!-- Submit Button -->
+         <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" id="save-network-btn" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Configurazione </button>
+          <div id="network-status" class="text-sm font-medium"></div>
+         </div>
+        </form>
        </div>
       </div>
      </section><!-- Users Management Section (Admin Only) -->
@@ -357,8 +472,8 @@ CREATE TABLE csirt_audits (
      <section id="companies-section" class="section-content hidden">
       <div class="max-w-6xl">
        <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestione Aziende</h2>
-       <p class="text-gray-600 mb-6">Crea e gestisci le aziende monitorate dalla piattaforma</p><!-- New Company Form -->
-       <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+       <p class="text-gray-600 mb-6" id="companies-section-subtitle">Crea e gestisci le aziende monitorate dalla piattaforma</p><!-- New Company Form (Admin Only) -->
+       <div id="company-form-container" class="bg-white rounded-xl shadow-md p-8 mb-8">
         <h3 class="text-xl font-bold text-gray-800 mb-6"><span id="company-form-title">➕ Aggiungi Nuova Azienda</span></h3>
         <form id="company-form" class="space-y-6"><input type="hidden" id="edit-company-id" value="">
          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -505,6 +620,12 @@ CREATE TABLE csirt_audits (
       // Filter menu items based on role
       filterMenuByRole();
       
+      // Show/hide CSIRT-specific cards in dashboard
+      if (currentUser.role === 'csirt') {
+        document.getElementById('csirt-designation-card').classList.remove('hidden');
+        document.getElementById('network-config-card').classList.remove('hidden');
+      }
+      
       // Load dashboard
       loadDashboard();
     }
@@ -551,7 +672,17 @@ CREATE TABLE csirt_audits (
         loadUsers();
         loadCompaniesForUserSelect();
       }
-      if (sectionName === 'companies') loadCompanies();
+      if (sectionName === 'companies') {
+        loadCompanies();
+        // Hide form for CSIRT role (view only)
+        if (currentUser && currentUser.role === 'csirt') {
+          document.getElementById('company-form-container').style.display = 'none';
+          document.getElementById('companies-section-subtitle').textContent = 'Visualizza le aziende assegnate (solo lettura)';
+        } else {
+          document.getElementById('company-form-container').style.display = 'block';
+          document.getElementById('companies-section-subtitle').textContent = 'Crea e gestisci le aziende monitorate dalla piattaforma';
+        }
+      }
     }
 
     // API Settings Functions
@@ -1177,6 +1308,132 @@ CREATE TABLE csirt_audits (
       document.getElementById('save-company-status').textContent = '';
     }
     
+    // ===== CSIRT DESIGNATION FORM =====
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const designationForm = document.getElementById('csirt-designation-form');
+      if (designationForm) {
+        designationForm.addEventListener('submit', handleDesignationSubmit);
+      }
+      
+      const networkForm = document.getElementById('network-config-form');
+      if (networkForm) {
+        networkForm.addEventListener('submit', handleNetworkSubmit);
+      }
+    });
+    
+    async function handleDesignationSubmit(event) {
+      event.preventDefault();
+      
+      const btn = document.getElementById('save-designation-btn');
+      const status = document.getElementById('designation-status');
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Salvataggio...';
+      status.textContent = 'Attendere...';
+      status.className = 'text-sm font-medium text-blue-600';
+      
+      try {
+        const designationData = {
+          appointment_date: document.getElementById('csirt-date').value,
+          referent_fullname: document.getElementById('csirt-fullname').value.trim(),
+          referent_cf: document.getElementById('csirt-cf').value.trim(),
+          referent_email: document.getElementById('csirt-email').value.trim(),
+          referent_phone: document.getElementById('csirt-phone').value.trim(),
+          acn_contact_name: document.getElementById('acn-name').value.trim(),
+          acn_contact_surname: document.getElementById('acn-surname').value.trim(),
+          acn_contact_email: document.getElementById('acn-email').value.trim(),
+          substitute1_name: document.getElementById('sub1-name').value.trim(),
+          substitute1_surname: document.getElementById('sub1-surname').value.trim(),
+          substitute1_email: document.getElementById('sub1-email').value.trim(),
+          substitute1_phone: document.getElementById('sub1-phone').value.trim(),
+          substitute2_name: document.getElementById('sub2-name').value.trim(),
+          substitute2_surname: document.getElementById('sub2-surname').value.trim(),
+          substitute2_email: document.getElementById('sub2-email').value.trim(),
+          substitute2_phone: document.getElementById('sub2-phone').value.trim(),
+          external_reason: document.getElementById('external-reason').value.trim()
+        };
+        
+        if (supabase) {
+          // Save to Supabase - will need to create table
+          console.log('📤 Dati designazione da salvare:', designationData);
+          // TODO: Save to Supabase when table is created
+        } else {
+          localStorage.setItem('csirt_designation', JSON.stringify(designationData));
+          console.log('✅ Designazione salvata in localStorage');
+        }
+        
+        status.textContent = '✅ Designazione salvata con successo!';
+        status.className = 'text-sm font-medium text-green-600';
+        
+        setTimeout(() => {
+          status.textContent = '';
+        }, 3000);
+        
+      } catch (error) {
+        console.error('❌ Errore salvataggio designazione:', error);
+        status.textContent = '❌ ' + error.message;
+        status.className = 'text-sm font-medium text-red-600';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Salva Designazione';
+      }
+    }
+    
+    async function handleNetworkSubmit(event) {
+      event.preventDefault();
+      
+      const btn = document.getElementById('save-network-btn');
+      const status = document.getElementById('network-status');
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Salvataggio...';
+      status.textContent = 'Attendere...';
+      status.className = 'text-sm font-medium text-blue-600';
+      
+      try {
+        const networkData = {
+          topology: document.getElementById('net-topology').value,
+          size: document.getElementById('net-size').value,
+          subnets: document.getElementById('net-subnets').value,
+          vlans: document.getElementById('net-vlans').value || 0,
+          firewall_type: document.getElementById('firewall-type').value,
+          firewall_vendor: document.getElementById('firewall-vendor').value.trim(),
+          has_ids: document.getElementById('has-ids').checked,
+          has_waf: document.getElementById('has-waf').checked,
+          isp_primary: document.getElementById('isp-primary').value.trim(),
+          isp_secondary: document.getElementById('isp-secondary').value.trim(),
+          bandwidth: document.getElementById('bandwidth').value.trim(),
+          has_vpn: document.getElementById('has-vpn').checked,
+          notes: document.getElementById('network-notes').value.trim()
+        };
+        
+        if (supabase) {
+          // Save to Supabase - will need to create table
+          console.log('📤 Dati rete da salvare:', networkData);
+          // TODO: Save to Supabase when table is created
+        } else {
+          localStorage.setItem('network_config', JSON.stringify(networkData));
+          console.log('✅ Configurazione rete salvata in localStorage');
+        }
+        
+        status.textContent = '✅ Configurazione salvata con successo!';
+        status.className = 'text-sm font-medium text-green-600';
+        
+        setTimeout(() => {
+          status.textContent = '';
+        }, 3000);
+        
+      } catch (error) {
+        console.error('❌ Errore salvataggio rete:', error);
+        status.textContent = '❌ ' + error.message;
+        status.className = 'text-sm font-medium text-red-600';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Salva Configurazione';
+      }
+    }
+    
     async function loadCompanies() {
       console.log('🔄 Caricamento aziende...');
       let companies = [];
@@ -1224,6 +1481,18 @@ CREATE TABLE csirt_audits (
           ? '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Essenziale</span>'
           : '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Importante</span>';
         
+        // Show edit/delete buttons only for admin
+        const actionsHtml = currentUser && currentUser.role === 'admin' 
+          ? `<div class="flex items-center space-x-3">
+              <button onclick="editCompany('${company.id}')" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+                ✏️ Modifica
+              </button>
+              <button onclick="deleteCompany('${company.id}')" class="text-red-600 hover:text-red-800 font-medium transition-colors">
+                🗑️ Elimina
+              </button>
+            </div>`
+          : '<span class="text-sm text-gray-500">Solo lettura</span>';
+        
         const tr = document.createElement('tr');
         tr.className = 'hover:bg-gray-50 transition-colors';
         tr.innerHTML = `
@@ -1239,14 +1508,7 @@ CREATE TABLE csirt_audits (
             <div class="text-xs text-gray-500">${company.phone}</div>
           </td>
           <td class="px-6 py-4 text-sm">
-            <div class="flex items-center space-x-3">
-              <button onclick="editCompany('${company.id}')" class="text-blue-600 hover:text-blue-800 font-medium transition-colors">
-                ✏️ Modifica
-              </button>
-              <button onclick="deleteCompany('${company.id}')" class="text-red-600 hover:text-red-800 font-medium transition-colors">
-                🗑️ Elimina
-              </button>
-            </div>
+            ${actionsHtml}
           </td>
         `;
         tbody.appendChild(tr);
@@ -1307,5 +1569,5 @@ CREATE TABLE csirt_audits (
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a94b84690a0e898',t:'MTc2NDk1MDA0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a94ec0db6aced2b',t:'MTc2NDk1MjE2My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
