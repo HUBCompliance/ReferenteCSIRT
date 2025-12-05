@@ -43,7 +43,7 @@
     <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
      <div><label class="block text-sm font-medium text-gray-700 mb-2">Email</label> <input type="email" id="login-email" placeholder="inserisci@email.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
      </div>
-     <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="login-password" placeholder="••••����������••" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+     <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="login-password" placeholder="•������•••••" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
      </div>
      <div><label class="block text-sm font-medium text-gray-700 mb-2">Profilo</label> <select id="login-role" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required> <option value="">Seleziona il tuo ruolo</option> <option value="admin">👤 Amministratore</option> <option value="csirt">🛡️ Consulente/Referente CSIRT</option> <option value="azienda">🏢 Referente Aziendale</option> </select>
      </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"> Accedi alla Piattaforma </button>
@@ -225,11 +225,11 @@
      </div><!-- API Settings Section (Admin Only) -->
      <section id="api-settings-section" class="section-content hidden">
       <h2 class="text-3xl font-bold text-gray-800 mb-6">Impostazioni API Supabase</h2>
-      <div class="bg-white rounded-xl shadow-md p-8 max-w-2xl">
+      <div class="bg-white rounded-xl shadow-md p-8 max-w-4xl">
        <div class="mb-6">
         <div class="flex items-center space-x-3 mb-4">
          <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
          </svg>
          <h3 class="text-xl font-bold text-gray-800">Configurazione Database</h3>
         </div>
@@ -237,14 +237,94 @@
        </div>
        <div id="api-connection-status" class="hidden mb-6 p-4 rounded-lg"><!-- Status will be inserted here -->
        </div>
-       <form id="api-settings-form" onsubmit="saveAPISettings(event)" class="space-y-6">
+       <form id="api-settings-form" onsubmit="saveAPISettings(event)" class="space-y-6 mb-8">
         <div><label class="block text-sm font-medium text-gray-700 mb-2"> Supabase URL <span class="text-red-500">*</span> </label> <input type="url" id="supabase-url" placeholder="https://xxx.supabase.co" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
         </div>
         <div><label class="block text-sm font-medium text-gray-700 mb-2"> Anon Public Key <span class="text-red-500">*</span> </label> <textarea id="supabase-key" rows="3" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm" required></textarea>
         </div>
         <div class="flex space-x-4"><button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"> Salva e Connetti </button> <button type="button" onclick="testAPIConnection()" class="px-6 py-3 border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"> Testa Connessione </button>
         </div>
-       </form>
+       </form><!-- SQL Setup Section -->
+       <div class="border-t border-gray-200 pt-8">
+        <div class="mb-4">
+         <h4 class="text-lg font-bold text-gray-800 mb-2">🛠️ Setup Database (PRIMA VOLTA)</h4>
+         <p class="text-sm text-gray-600 mb-4">Se è la prima volta che usi questa piattaforma, <strong>copia questo script SQL</strong> ed eseguilo nell'editor SQL di Supabase per creare tutte le tabelle necessarie.</p>
+         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+          <div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-gray-700">Script SQL Database</span> <button onclick="copySQLScript()" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"> 📋 Copia Script </button>
+          </div>
+          <pre id="sql-script" class="bg-gray-900 text-green-400 p-4 rounded text-xs overflow-x-auto" style="max-height: 400px; font-family: 'Courier New', monospace;">-- 🗄️ SETUP DATABASE PIATTAFORMA CSIRT
+-- Esegui questo script nell'editor SQL di Supabase (SQL Editor)
+
+-- 1️⃣ Tabella Aziende
+CREATE TABLE IF NOT EXISTS csirt_companies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_name TEXT NOT NULL,
+  vat_number TEXT UNIQUE NOT NULL,
+  sector TEXT NOT NULL,
+  nis2_category TEXT NOT NULL,
+  full_address TEXT,
+  company_email TEXT NOT NULL,
+  company_phone TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 2️⃣ Tabella Utenti
+CREATE TABLE IF NOT EXISTS csirt_users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  role TEXT NOT NULL,
+  company_id UUID REFERENCES csirt_companies(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 3️⃣ Tabella Incidenti
+CREATE TABLE IF NOT EXISTS csirt_incidents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID REFERENCES csirt_companies(id) ON DELETE CASCADE,
+  incident_title TEXT NOT NULL,
+  incident_description TEXT NOT NULL,
+  incident_severity TEXT NOT NULL,
+  incident_status TEXT NOT NULL,
+  incident_date TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 4️⃣ Tabella Notifiche ACN
+CREATE TABLE IF NOT EXISTS csirt_notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  incident_id UUID REFERENCES csirt_incidents(id) ON DELETE CASCADE,
+  notification_type TEXT NOT NULL,
+  notification_status TEXT NOT NULL,
+  notification_date TIMESTAMP WITH TIME ZONE NOT NULL,
+  recipient_email TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 5️⃣ Tabella Audit e Compliance
+CREATE TABLE IF NOT EXISTS csirt_audits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID REFERENCES csirt_companies(id) ON DELETE CASCADE,
+  audit_title TEXT NOT NULL,
+  audit_date TIMESTAMP WITH TIME ZONE NOT NULL,
+  audit_score INTEGER NOT NULL,
+  audit_notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ✅ Setup completato! Ora puoi usare la piattaforma.</pre>
+         </div>
+         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <p class="text-sm text-blue-800"><strong>📍 Dove eseguire lo script:</strong><br>
+            1. Vai su Supabase Dashboard → SQL Editor<br>
+            2. Crea una "New query"<br>
+            3. Incolla lo script sopra<br>
+            4. Clicca "Run" (o premi Ctrl+Enter)<br>
+            5. Torna qui e clicca "Salva e Connetti"</p>
+         </div>
+        </div>
+       </div>
       </div>
      </section><!-- Companies Management Section -->
      <section id="companies-section" class="section-content hidden">
@@ -483,7 +563,7 @@
         if (error) throw error;
         showAPIStatus('success', '✅ Connessione riuscita!');
       } catch (error) {
-        showAPIStatus('error', '����� Test fallito: ' + error.message);
+        showAPIStatus('error', '❌ Test fallito: ' + error.message);
       }
     }
 
@@ -499,6 +579,20 @@
       
       statusDiv.className = `p-4 rounded-lg border ${colors[type]}`;
       statusDiv.innerHTML = `<p class="font-medium">${message}</p>`;
+    }
+
+    function copySQLScript() {
+      const scriptText = document.getElementById('sql-script').textContent;
+      navigator.clipboard.writeText(scriptText).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '✅ Copiato!';
+        btn.classList.add('bg-green-600');
+        setTimeout(() => {
+          btn.textContent = originalText;
+          btn.classList.remove('bg-green-600');
+        }, 2000);
+      });
     }
 
     // Dashboard
@@ -607,27 +701,18 @@
       }
       
       if (supabase) {
-        // Prova prima a fare una query di test per vedere quali colonne esistono
-        const { data: testData, error: testError } = await supabase
-          .from('csirt_users')
-          .select('*')
-          .limit(1);
-        
-        // Se la tabella esiste, prova l'insert
         const { data, error } = await supabase.from('csirt_users').insert([userData]).select();
         
         if (error) {
-          // Mostra errore dettagliato
           let errorMsg = 'Errore nel salvataggio: ' + error.message;
           
           if (error.message.includes('column') || error.message.includes('schema')) {
-            errorMsg += '\n\n⚠️ SOLUZIONE: Verifica che la tabella "csirt_users" in Supabase abbia queste colonne:\n';
-            errorMsg += '- name (text)\n';
-            errorMsg += '- email (text)\n';
-            errorMsg += '- password (text)\n';
-            errorMsg += '- role (text)\n';
-            errorMsg += '- company_id (uuid o bigint, nullable)\n';
-            errorMsg += '- created_at (timestamp with time zone, default now())';
+            errorMsg += '\n\n⚠️ SOLUZIONE:\n';
+            errorMsg += '1. Vai su Supabase Dashboard → SQL Editor\n';
+            errorMsg += '2. Vai alla sezione "Impostazioni API" qui sopra\n';
+            errorMsg += '3. Copia e incolla lo script SQL per creare le tabelle\n';
+            errorMsg += '4. Clicca "Run" in Supabase\n';
+            errorMsg += '5. Riprova a salvare l\'utente';
           }
           
           alert(errorMsg);
@@ -730,8 +815,8 @@
         sector: document.getElementById('company-sector').value,
         nis2_category: document.getElementById('company-category').value,
         full_address: document.getElementById('company-address').value,
-        email: document.getElementById('company-email').value,
-        phone: document.getElementById('company-phone').value
+        company_email: document.getElementById('company-email').value,
+        company_phone: document.getElementById('company-phone').value
       };
       
       if (supabase) {
@@ -810,8 +895,8 @@
           <div class="space-y-2 text-sm mb-4">
             <p class="text-gray-600"><strong>Settore:</strong> ${company.sector}</p>
             <p class="text-gray-600"><strong>Indirizzo:</strong> ${company.full_address || '-'}</p>
-            <p class="text-gray-600"><strong>Email:</strong> ${company.email}</p>
-            <p class="text-gray-600"><strong>Telefono:</strong> ${company.phone}</p>
+            <p class="text-gray-600"><strong>Email:</strong> ${company.company_email}</p>
+            <p class="text-gray-600"><strong>Telefono:</strong> ${company.company_phone}</p>
           </div>
           
           <div class="flex space-x-2 pt-4 border-t border-gray-200">
@@ -871,5 +956,5 @@
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a941b09a6550e73',t:'MTc2NDk0MzYwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a94267c531fed92',t:'MTc2NDk0NDA3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
