@@ -18,7 +18,7 @@
       }
     }, true);
     
-    // Suppress Tailwind CDN warning (this is a prototype/development environment)
+    // Suppress Tailwind CDN warning
     window.tailwind = { config: {} };
   </script>
   <style>
@@ -189,14 +189,14 @@
         </div>
        </div>
       </div><!-- Recent Activity -->
-      <div class="bg-white rounded-xl shadow-md p-6" id="recent-activity-card">
+      <div class="bg-white rounded-xl shadow-md p-6 mb-8">
        <h3 class="text-xl font-bold text-gray-800 mb-4">Attività Recenti</h3>
        <div id="recent-activity" class="space-y-3">
         <p class="text-gray-500 text-center py-8">Nessuna attività recente</p>
        </div>
-      </div><!-- CSIRT-Specific Cards (Clickable) -->
-      <div id="csirt-dashboard-cards" class="hidden mt-8">
-       <div class="grid grid-cols-1 md:grid-cols-3 gap-6"><!-- Registro Incidenti Card -->
+      </div><!-- CSIRT Dashboard Cards -->
+      <div id="csirt-dashboard-cards" class="hidden">
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div onclick="showSection('incidents')" class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl shadow-md p-6 border-l-4 border-red-500 cursor-pointer hover:shadow-xl transition-all transform hover:scale-105">
          <div class="flex items-center justify-between mb-4">
           <div class="bg-red-500 p-3 rounded-full">
@@ -211,7 +211,7 @@
          <div class="mt-4 text-sm font-medium text-red-700">
           Clicca per gestire →
          </div>
-        </div><!-- Designazione Referente Card -->
+        </div>
         <div onclick="showSection('designation-detail')" class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-md p-6 border-l-4 border-purple-500 cursor-pointer hover:shadow-xl transition-all transform hover:scale-105">
          <div class="flex items-center justify-between mb-4">
           <div class="bg-purple-500 p-3 rounded-full">
@@ -226,8 +226,8 @@
          <div class="mt-4 text-sm font-medium text-purple-700">
           Clicca per compilare →
          </div>
-        </div><!-- Configurazione Rete Card -->
-        <div onclick="showSection('network-detail')" class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-6 border-l-4 border-green-500 cursor-pointer hover:shadow-xl transition-all transform hover:scale-105">
+        </div>
+        <div onclick="showSection('network')" class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-6 border-l-4 border-green-500 cursor-pointer hover:shadow-xl transition-all transform hover:scale-105">
          <div class="flex items-center justify-between mb-4">
           <div class="bg-green-500 p-3 rounded-full">
            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -244,14 +244,323 @@
         </div>
        </div>
       </div>
-     </section><!-- Users Management Section (Admin Only) -->
+     </section><!-- Companies Section -->
+     <section id="companies-section" class="section-content hidden">
+      <div class="max-w-6xl">
+       <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestione Aziende</h2>
+       <p class="text-gray-600 mb-6">Registra e monitora le aziende clienti soggette a NIS2</p>
+       <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6"><span id="company-form-title">➕ Aggiungi Nuova Azienda</span></h3>
+        <form id="new-company-form" onsubmit="handleCompanySubmit(event)" class="space-y-6"><input type="hidden" id="edit-company-id" value="">
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div><label for="company-name" class="block text-sm font-medium text-gray-700 mb-2"> Ragione Sociale <span class="text-red-500">*</span> </label> <input type="text" id="company-name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="es. Acme SRL">
+          </div>
+          <div><label for="company-vat" class="block text-sm font-medium text-gray-700 mb-2"> Partita IVA <span class="text-red-500">*</span> </label> <input type="text" id="company-vat" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="es. IT12345678901">
+          </div>
+          <div><label for="company-sector" class="block text-sm font-medium text-gray-700 mb-2"> Settore <span class="text-red-500">*</span> </label> <select id="company-sector" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Seleziona settore</option> <option value="energia">Energia</option> <option value="trasporti">Trasporti</option> <option value="bancario">Bancario</option> <option value="sanitario">Sanitario</option> <option value="digitale">Servizi Digitali</option> <option value="acqua">Acqua</option> <option value="altro">Altro</option> </select>
+          </div>
+          <div><label for="company-category" class="block text-sm font-medium text-gray-700 mb-2"> Categoria NIS2 <span class="text-red-500">*</span> </label> <select id="company-category" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"> <option value="">Seleziona categoria</option> <option value="essenziale">Essenziale</option> <option value="importante">Importante</option> </select>
+          </div>
+          <div class="md:col-span-2"><label for="company-address" class="block text-sm font-medium text-gray-700 mb-2"> Indirizzo </label> <input type="text" id="company-address" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="es. Via Roma 123, Milano">
+          </div>
+          <div><label for="company-email" class="block text-sm font-medium text-gray-700 mb-2"> Email <span class="text-red-500">*</span> </label> <input type="email" id="company-email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="es. info@acme.it">
+          </div>
+          <div><label for="company-phone" class="block text-sm font-medium text-gray-700 mb-2"> Telefono <span class="text-red-500">*</span> </label> <input type="tel" id="company-phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="es. +39 02 12345678">
+          </div>
+         </div>
+         <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" id="save-company-btn" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Azienda </button> <button type="button" onclick="cancelEditCompany()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"> 🔄 Annulla </button>
+          <div id="company-save-status" class="text-sm font-medium"></div>
+         </div>
+        </form>
+       </div>
+       <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+         <h3 class="text-lg font-bold text-gray-800">📋 Aziende Registrate</h3>
+        </div>
+        <div class="overflow-x-auto">
+         <table class="w-full">
+          <thead class="bg-gray-50">
+           <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azienda</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P.IVA</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Settore</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contatti</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
+           </tr>
+          </thead>
+          <tbody id="companies-table-body" class="bg-white divide-y divide-gray-200"><!-- Companies will be loaded here -->
+          </tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </section><!-- Incidents Section -->
+     <section id="incidents-section" class="section-content hidden">
+      <div class="max-w-6xl">
+       <h2 class="text-3xl font-bold text-gray-800 mb-2">Registro Incidenti di Sicurezza</h2>
+       <p class="text-gray-600 mb-6">Documenta e traccia tutti gli incidenti secondo i requisiti NIS2</p>
+       <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6"><span id="incident-form-title">➕ Registra Nuovo Incidente</span></h3>
+        <form id="new-incident-form" onsubmit="handleIncidentSubmit(event)" class="space-y-6"><input type="hidden" id="edit-incident-id" value="">
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="md:col-span-2"><label for="incident-title" class="block text-sm font-medium text-gray-700 mb-2"> Titolo Incidente <span class="text-red-500">*</span> </label> <input type="text" id="incident-title" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="es. Attacco ransomware ai server di produzione">
+          </div>
+          <div><label for="incident-company" class="block text-sm font-medium text-gray-700 mb-2"> Azienda <span class="text-red-500">*</span> </label> <select id="incident-company" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"> <option value="">Seleziona azienda</option> </select>
+          </div>
+          <div><label for="incident-date" class="block text-sm font-medium text-gray-700 mb-2"> Data Rilevamento <span class="text-red-500">*</span> </label> <input type="datetime-local" id="incident-date" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+          </div>
+          <div><label for="incident-category" class="block text-sm font-medium text-gray-700 mb-2"> Categoria <span class="text-red-500">*</span> </label> <select id="incident-category" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"> <option value="">Seleziona categoria</option> <option value="malware">Malware/Ransomware</option> <option value="phishing">Phishing</option> <option value="ddos">DDoS</option> <option value="data-breach">Data Breach</option> <option value="unauthorized-access">Accesso non autorizzato</option> <option value="altro">Altro</option> </select>
+          </div>
+          <div><label for="incident-severity" class="block text-sm font-medium text-gray-700 mb-2"> Severità <span class="text-red-500">*</span> </label> <select id="incident-severity" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"> <option value="">Seleziona severità</option> <option value="critical">🔴 Critica</option> <option value="high">🟠 Alta</option> <option value="medium">🟡 Media</option> <option value="low">🔵 Bassa</option> </select>
+          </div>
+          <div><label for="incident-status" class="block text-sm font-medium text-gray-700 mb-2"> Stato <span class="text-red-500">*</span> </label> <select id="incident-status" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"> <option value="aperto">🔴 Aperto</option> <option value="in-corso">🟡 In Corso</option> <option value="risolto">🟢 Risolto</option> </select>
+          </div>
+          <div class="md:col-span-2"><label for="incident-systems" class="block text-sm font-medium text-gray-700 mb-2"> Sistemi Interessati <span class="text-red-500">*</span> </label> <input type="text" id="incident-systems" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="es. Server Windows DC01, Database Produzione">
+          </div>
+          <div><label for="incident-users" class="block text-sm font-medium text-gray-700 mb-2"> Utenti Coinvolti </label> <input type="number" id="incident-users" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Numero utenti interessati">
+          </div>
+          <div><label for="incident-data-compromised" class="block text-sm font-medium text-gray-700 mb-2"> Dati Compromessi </label> <input type="text" id="incident-data-compromised" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="es. Dati personali, credenziali">
+          </div>
+          <div class="md:col-span-2"><label for="incident-impact" class="block text-sm font-medium text-gray-700 mb-2"> Descrizione Impatto <span class="text-red-500">*</span> </label> <textarea id="incident-impact" required rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Descrivi l'impatto dell'incidente sui servizi e sui dati"></textarea>
+          </div>
+          <div class="md:col-span-2"><label for="incident-technical" class="block text-sm font-medium text-gray-700 mb-2"> Dettagli Tecnici <span class="text-red-500">*</span> </label> <textarea id="incident-technical" required rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Dettagli tecnici dell'incidente, vettore di attacco, ecc."></textarea>
+          </div>
+          <div class="md:col-span-2"><label for="incident-containment" class="block text-sm font-medium text-gray-700 mb-2"> Azioni di Contenimento <span class="text-red-500">*</span> </label> <textarea id="incident-containment" required rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Azioni immediate per contenere l'incidente"></textarea>
+          </div>
+          <div class="md:col-span-2"><label for="incident-notes" class="block text-sm font-medium text-gray-700 mb-2"> Note Aggiuntive </label> <textarea id="incident-notes" rows="2" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Altre informazioni rilevanti"></textarea>
+          </div>
+         </div>
+         <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" id="save-incident-btn" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Incidente </button> <button type="button" onclick="cancelEditIncident()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"> 🔄 Annulla </button>
+          <div id="incident-save-status" class="text-sm font-medium"></div>
+         </div>
+        </form>
+       </div>
+       <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+         <h3 class="text-lg font-bold text-gray-800">📋 Incidenti Registrati</h3>
+        </div>
+        <div class="overflow-x-auto">
+         <table class="w-full">
+          <thead class="bg-gray-50">
+           <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titolo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azienda</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Severità</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stato</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
+           </tr>
+          </thead>
+          <tbody id="incidents-table-body" class="bg-white divide-y divide-gray-200"><!-- Incidents will be loaded here -->
+          </tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </section><!-- Notifications Section -->
+     <section id="notifications-section" class="section-content hidden">
+      <div class="max-w-6xl">
+       <h2 class="text-3xl font-bold text-gray-800 mb-2">Notifiche ACN</h2>
+       <p class="text-gray-600 mb-6">Gestisci le notifiche all'Agenzia per la Cybersicurezza Nazionale</p>
+       <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6">➕ Crea Nuova Notifica</h3>
+        <form id="new-notification-form" onsubmit="handleNotificationSubmit(event)" class="space-y-6">
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div><label for="notification-incident" class="block text-sm font-medium text-gray-700 mb-2"> Incidente Correlato <span class="text-red-500">*</span> </label> <select id="notification-incident" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"> <option value="">Seleziona incidente</option> </select>
+          </div>
+          <div><label for="notification-type" class="block text-sm font-medium text-gray-700 mb-2"> Tipo Notifica <span class="text-red-500">*</span> </label> <select id="notification-type" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"> <option value="">Seleziona tipo</option> <option value="preallarme">Preallarme (entro 24h)</option> <option value="notifica-completa">Notifica Completa (entro 72h)</option> <option value="report-finale">Report Finale (entro 1 mese)</option> </select>
+          </div>
+          <div><label for="notification-date" class="block text-sm font-medium text-gray-700 mb-2"> Data Notifica <span class="text-red-500">*</span> </label> <input type="datetime-local" id="notification-date" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent">
+          </div>
+          <div><label for="notification-status" class="block text-sm font-medium text-gray-700 mb-2"> Stato <span class="text-red-500">*</span> </label> <select id="notification-status" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"> <option value="pending">⏳ In Attesa</option> <option value="inviata">���� Inviata</option> <option value="confermata">✅ Confermata da ACN</option> </select>
+          </div>
+          <div class="md:col-span-2"><label for="notification-recipient" class="block text-sm font-medium text-gray-700 mb-2"> Destinatario <span class="text-red-500">*</span> </label> <input type="text" id="notification-recipient" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent" value="csirt@acn.gov.it" placeholder="Email destinatario ACN">
+          </div>
+         </div>
+         <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" id="save-notification-btn" class="px-8 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Notifica </button>
+          <div id="notification-save-status" class="text-sm font-medium"></div>
+         </div>
+        </form>
+       </div>
+       <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+         <h3 class="text-lg font-bold text-gray-800">📋 Notifiche Registrate</h3>
+        </div>
+        <div class="overflow-x-auto">
+         <table class="w-full">
+          <thead class="bg-gray-50">
+           <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Incidente</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Notifica</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destinatario</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stato</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
+           </tr>
+          </thead>
+          <tbody id="notifications-table-body" class="bg-white divide-y divide-gray-200"><!-- Notifications will be loaded here -->
+          </tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </section><!-- CSIRT Profile Section -->
+     <section id="csirt-profile-section" class="section-content hidden">
+      <div class="max-w-4xl">
+       <h2 class="text-3xl font-bold text-gray-800 mb-6">Profilo Consulente CSIRT</h2>
+       <div class="bg-white rounded-xl shadow-md p-8">
+        <form id="csirt-profile-form" onsubmit="handleProfileSubmit(event)" class="space-y-6">
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="md:col-span-2"><label for="profile-name" class="block text-sm font-medium text-gray-700 mb-2"> Nome Completo <span class="text-red-500">*</span> </label> <input type="text" id="profile-name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          </div>
+          <div><label for="profile-email" class="block text-sm font-medium text-gray-700 mb-2"> Email <span class="text-red-500">*</span> </label> <input type="email" id="profile-email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          </div>
+          <div><label for="profile-phone" class="block text-sm font-medium text-gray-700 mb-2"> Telefono <span class="text-red-500">*</span> </label> <input type="tel" id="profile-phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          </div>
+          <div class="md:col-span-2"><label for="profile-certifications" class="block text-sm font-medium text-gray-700 mb-2"> Certificazioni </label> <input type="text" id="profile-certifications" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. CISSP, CEH, CISM">
+          </div>
+          <div class="md:col-span-2"><label for="profile-experience" class="block text-sm font-medium text-gray-700 mb-2"> Esperienza </label> <textarea id="profile-experience" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Descrivi la tua esperienza nel campo della cybersecurity"></textarea>
+          </div>
+         </div>
+         <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Profilo </button>
+          <div id="profile-save-status" class="text-sm font-medium"></div>
+         </div>
+        </form>
+       </div>
+      </div>
+     </section><!-- Network Section -->
+     <section id="network-section" class="section-content hidden">
+      <div class="max-w-6xl">
+       <h2 class="text-3xl font-bold text-gray-800 mb-2">Configurazione Rete Aziendale</h2>
+       <p class="text-gray-600 mb-6">Definisci la topologia, sicurezza perimetrale e connettività della rete</p><!-- Tab Navigation -->
+       <div class="bg-white rounded-t-xl shadow-md">
+        <div class="flex border-b border-gray-200"><button id="tab-config" onclick="showNetworkTab('config')" class="network-tab px-6 py-4 text-sm font-medium border-b-2 border-blue-600 text-blue-600"> ⚙️ Configurazione </button> <button id="tab-diagram" onclick="showNetworkTab('diagram')" class="network-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700"> 📊 Diagramma </button> <button id="tab-hierarchy" onclick="showNetworkTab('hierarchy')" class="network-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700"> 🌳 Gerarchia </button>
+        </div>
+       </div><!-- Config Tab -->
+       <div id="network-tab-config" class="network-tab-content bg-white rounded-b-xl shadow-md p-8">
+        <form id="network-config-form" onsubmit="handleNetworkSubmit(event)" class="space-y-6"><!-- Topologia di Rete -->
+         <div class="border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">🌐 Topologia di Rete</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="net-topology" class="block text-sm font-medium text-gray-700 mb-2"> Tipo Topologia <span class="text-red-500">*</span> </label> <select id="net-topology" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"> <option value="">Seleziona topologia</option> <option value="star">⭐ Stella</option> <option value="mesh">🕸️ Mesh</option> <option value="hybrid">🔀 Ibrida</option> <option value="hierarchical">📊 Gerarchica</option> </select>
+           </div>
+           <div><label for="net-size" class="block text-sm font-medium text-gray-700 mb-2"> Dimensione Rete <span class="text-red-500">*</span> </label> <select id="net-size" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"> <option value="">Seleziona dimensione</option> <option value="small">Piccola (&lt; 50 dispositivi)</option> <option value="medium">Media (50-200 dispositivi)</option> <option value="large">Grande (&gt; 200 dispositivi)</option> </select>
+           </div>
+           <div><label for="net-subnets" class="block text-sm font-medium text-gray-700 mb-2"> Numero Subnet <span class="text-red-500">*</span> </label> <input type="number" id="net-subnets" required min="1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="es. 5">
+           </div>
+           <div><label for="net-vlans" class="block text-sm font-medium text-gray-700 mb-2"> Numero VLAN </label> <input type="number" id="net-vlans" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="es. 3">
+           </div>
+          </div>
+         </div><!-- Sicurezza Perimetrale -->
+         <div class="border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">🔒 Sicurezza Perimetrale</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="firewall-type" class="block text-sm font-medium text-gray-700 mb-2"> Tipo Firewall <span class="text-red-500">*</span> </label> <select id="firewall-type" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"> <option value="">Seleziona tipo</option> <option value="ngfw">🔥 NGFW (Next-Gen)</option> <option value="stateful">📊 Stateful</option> <option value="utm">🛡️ UTM</option> <option value="cloud">☁️ Cloud-based</option> </select>
+           </div>
+           <div><label for="firewall-vendor" class="block text-sm font-medium text-gray-700 mb-2"> Vendor Firewall </label> <input type="text" id="firewall-vendor" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="es. Palo Alto, Fortinet, Cisco">
+           </div>
+           <div class="flex items-center space-x-4"><input type="checkbox" id="has-ids" class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"> <label for="has-ids" class="text-sm font-medium text-gray-700"> IDS/IPS Attivo </label>
+           </div>
+           <div class="flex items-center space-x-4"><input type="checkbox" id="has-waf" class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"> <label for="has-waf" class="text-sm font-medium text-gray-700"> WAF (Web Application Firewall) </label>
+           </div>
+          </div>
+         </div><!-- Connettività -->
+         <div class="border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">📡 Connettività</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="isp-primary" class="block text-sm font-medium text-gray-700 mb-2"> ISP Primario <span class="text-red-500">*</span> </label> <input type="text" id="isp-primary" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="es. TIM, Vodafone">
+           </div>
+           <div><label for="isp-secondary" class="block text-sm font-medium text-gray-700 mb-2"> ISP Secondario (Backup) </label> <input type="text" id="isp-secondary" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="es. Fastweb">
+           </div>
+           <div><label for="bandwidth" class="block text-sm font-medium text-gray-700 mb-2"> Banda Disponibile <span class="text-red-500">*</span> </label> <input type="text" id="bandwidth" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="es. 1 Gbps">
+           </div>
+           <div class="flex items-center space-x-4"><input type="checkbox" id="has-vpn" class="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"> <label for="has-vpn" class="text-sm font-medium text-gray-700"> VPN Aziendale Configurata </label>
+           </div>
+          </div>
+         </div><!-- Note -->
+         <div><label for="network-notes" class="block text-sm font-medium text-gray-700 mb-2"> Note Aggiuntive </label> <textarea id="network-notes" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Aggiungi dettagli sulla configurazione di rete"></textarea>
+         </div>
+         <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" id="save-network-btn" class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Configurazione </button>
+          <div id="network-status" class="text-sm font-medium"></div>
+         </div>
+        </form>
+       </div><!-- Diagram Tab -->
+       <div id="network-tab-diagram" class="network-tab-content hidden bg-white rounded-b-xl shadow-md p-8">
+        <div id="network-visual-diagram" class="min-h-96">
+         <div class="flex flex-col items-center justify-center py-16 text-center">
+          <svg class="w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p class="text-xl font-semibold text-gray-600 mb-2">Nessuna configurazione salvata</p>
+          <p class="text-gray-500">Compila e salva la configurazione nel tab "⚙️ Configurazione" per visualizzare il diagramma</p>
+         </div>
+        </div>
+       </div><!-- Hierarchy Tab -->
+       <div id="network-tab-hierarchy" class="network-tab-content hidden bg-white rounded-b-xl shadow-md p-8">
+        <div id="network-hierarchy-view" class="min-h-96">
+         <div class="flex flex-col items-center justify-center py-16 text-center">
+          <svg class="w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+          </svg>
+          <p class="text-xl font-semibold text-gray-600 mb-2">Nessuna configurazione salvata</p>
+          <p class="text-gray-500">Compila e salva la configurazione nel tab "⚙️ Configurazione" per visualizzare la gerarchia</p>
+         </div>
+        </div>
+       </div>
+      </div>
+     </section><!-- Audit Section -->
+     <section id="audit-section" class="section-content hidden">
+      <div class="max-w-6xl">
+       <h2 class="text-3xl font-bold text-gray-800 mb-2">Audit e Compliance NIS2</h2>
+       <p class="text-gray-600 mb-6">Traccia audit e verifiche di conformità alla direttiva NIS2</p>
+       <div class="bg-white rounded-xl shadow-md p-8 mb-8">
+        <h3 class="text-xl font-bold text-gray-800 mb-6">➕ Registra Nuovo Audit</h3>
+        <form id="new-audit-form" onsubmit="handleAuditSubmit(event)" class="space-y-6">
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="md:col-span-2"><label for="audit-title" class="block text-sm font-medium text-gray-700 mb-2"> Titolo Audit <span class="text-red-500">*</span> </label> <input type="text" id="audit-title" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="es. Verifica Conformità NIS2 - Q1 2024">
+          </div>
+          <div><label for="audit-company" class="block text-sm font-medium text-gray-700 mb-2"> Azienda <span class="text-red-500">*</span> </label> <select id="audit-company" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"> <option value="">Seleziona azienda</option> </select>
+          </div>
+          <div><label for="audit-date" class="block text-sm font-medium text-gray-700 mb-2"> Data Audit <span class="text-red-500">*</span> </label> <input type="date" id="audit-date" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+          </div>
+          <div><label for="audit-score" class="block text-sm font-medium text-gray-700 mb-2"> Score Compliance (0-100) <span class="text-red-500">*</span> </label> <input type="number" id="audit-score" required min="0" max="100" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="es. 85">
+          </div>
+          <div class="md:col-span-2"><label for="audit-notes" class="block text-sm font-medium text-gray-700 mb-2"> Note e Osservazioni </label> <textarea id="audit-notes" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Dettagli dell'audit, aree di miglioramento, raccomandazioni"></textarea>
+          </div>
+         </div>
+         <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" id="save-audit-btn" class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Audit </button>
+          <div id="audit-save-status" class="text-sm font-medium"></div>
+         </div>
+        </form>
+       </div>
+       <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+         <h3 class="text-lg font-bold text-gray-800">📋 Audit Registrati</h3>
+        </div>
+        <div class="overflow-x-auto">
+         <table class="w-full">
+          <thead class="bg-gray-50">
+           <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titolo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azienda</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
+           </tr>
+          </thead>
+          <tbody id="audits-table-body" class="bg-white divide-y divide-gray-200"><!-- Audits will be loaded here -->
+          </tbody>
+         </table>
+        </div>
+       </div>
+      </div>
+     </section><!-- Users Management Section -->
      <section id="users-section" class="section-content hidden">
       <div class="max-w-6xl">
        <h2 class="text-3xl font-bold text-gray-800 mb-2">Gestione Utenti</h2>
-       <p class="text-gray-600 mb-6">Crea e gestisci gli utenti della piattaforma</p><!-- New User Form -->
+       <p class="text-gray-600 mb-6">Crea e gestisci gli utenti della piattaforma</p>
        <div class="bg-white rounded-xl shadow-md p-8 mb-8">
-        <h3 class="text-xl font-bold text-gray-800 mb-6"><span id="form-title">➕ Aggiungi Nuovo Utente</span></h3>
-        <form id="new-user-form" class="space-y-6"><input type="hidden" id="edit-user-id" value="">
+        <h3 class="text-xl font-bold text-gray-800 mb-6"><span id="user-form-title">➕ Aggiungi Nuovo Utente</span></h3>
+        <form id="new-user-form" onsubmit="handleUserSubmit(event)" class="space-y-6"><input type="hidden" id="edit-user-id" value="">
          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div><label for="new-user-name" class="block text-sm font-medium text-gray-700 mb-2"> Nome Completo <span class="text-red-500">*</span> </label> <input type="text" id="new-user-name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. Mario Rossi">
           </div>
@@ -265,10 +574,10 @@
           </div>
          </div>
          <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" id="save-user-btn" class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Utente </button> <button type="button" onclick="cancelEditUser()" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"> 🔄 Annulla </button>
-          <div id="save-status" class="text-sm font-medium"></div>
+          <div id="user-save-status" class="text-sm font-medium"></div>
          </div>
         </form>
-       </div><!-- Users List -->
+       </div>
        <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
          <h3 class="text-lg font-bold text-gray-800">📋 Utenti Registrati</h3>
@@ -291,7 +600,81 @@
         </div>
        </div>
       </div>
-     </section><!-- API Settings Section (Admin Only) -->
+     </section><!-- Designation Detail Section (NEW) -->
+     <section id="designation-detail-section" class="section-content hidden">
+      <div class="max-w-5xl">
+       <h2 class="text-3xl font-bold text-gray-800 mb-2">📋 Designazione Referente CSIRT</h2>
+       <p class="text-gray-600 mb-6">Compila i dati del referente CSIRT, sostituti e contatto ACN secondo normativa NIS2</p>
+       <div class="bg-white rounded-xl shadow-md p-8">
+        <form id="designation-form" onsubmit="handleDesignationSubmit(event)" class="space-y-8"><!-- Dati Generali -->
+         <div class="border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">📅 Dati Generali</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="des-company" class="block text-sm font-medium text-gray-700 mb-2"> Azienda <span class="text-red-500">*</span> </label> <select id="des-company" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"> <option value="">Seleziona azienda</option> </select>
+           </div>
+           <div><label for="des-appointment-date" class="block text-sm font-medium text-gray-700 mb-2"> Data Nomina <span class="text-red-500">*</span> </label> <input type="date" id="des-appointment-date" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+           </div>
+          </div>
+         </div><!-- Referente CSIRT -->
+         <div class="border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">👤 Referente CSIRT</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="des-ref-fullname" class="block text-sm font-medium text-gray-700 mb-2"> Nome e Cognome <span class="text-red-500">*</span> </label> <input type="text" id="des-ref-fullname" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. Mario Rossi">
+           </div>
+           <div><label for="des-ref-cf" class="block text-sm font-medium text-gray-700 mb-2"> Codice Fiscale <span class="text-red-500">*</span> </label> <input type="text" id="des-ref-cf" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. RSSMRA80A01H501Z">
+           </div>
+           <div><label for="des-ref-email" class="block text-sm font-medium text-gray-700 mb-2"> Email <span class="text-red-500">*</span> </label> <input type="email" id="des-ref-email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. mario.rossi@azienda.it">
+           </div>
+           <div><label for="des-ref-phone" class="block text-sm font-medium text-gray-700 mb-2"> Telefono <span class="text-red-500">*</span> </label> <input type="tel" id="des-ref-phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. +39 333 1234567">
+           </div>
+          </div>
+         </div><!-- Contatto ACN -->
+         <div class="border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">🏛️ Contatto ACN</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+           <div><label for="des-acn-name" class="block text-sm font-medium text-gray-700 mb-2"> Nome <span class="text-red-500">*</span> </label> <input type="text" id="des-acn-name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. Luigi">
+           </div>
+           <div><label for="des-acn-surname" class="block text-sm font-medium text-gray-700 mb-2"> Cognome <span class="text-red-500">*</span> </label> <input type="text" id="des-acn-surname" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. Verdi">
+           </div>
+           <div><label for="des-acn-email" class="block text-sm font-medium text-gray-700 mb-2"> Email <span class="text-red-500">*</span> </label> <input type="email" id="des-acn-email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. luigi.verdi@acn.gov.it">
+           </div>
+          </div>
+         </div><!-- Sostituto 1 -->
+         <div class="border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">👥 Sostituto 1</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="des-sub1-name" class="block text-sm font-medium text-gray-700 mb-2"> Nome <span class="text-red-500">*</span> </label> <input type="text" id="des-sub1-name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. Anna">
+           </div>
+           <div><label for="des-sub1-surname" class="block text-sm font-medium text-gray-700 mb-2"> Cognome <span class="text-red-500">*</span> </label> <input type="text" id="des-sub1-surname" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. Bianchi">
+           </div>
+           <div><label for="des-sub1-email" class="block text-sm font-medium text-gray-700 mb-2"> Email <span class="text-red-500">*</span> </label> <input type="email" id="des-sub1-email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. anna.bianchi@azienda.it">
+           </div>
+           <div><label for="des-sub1-phone" class="block text-sm font-medium text-gray-700 mb-2"> Telefono <span class="text-red-500">*</span> </label> <input type="tel" id="des-sub1-phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. +39 333 9876543">
+           </div>
+          </div>
+         </div><!-- Sostituto 2 -->
+         <div class="border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">👥 Sostituto 2</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div><label for="des-sub2-name" class="block text-sm font-medium text-gray-700 mb-2"> Nome <span class="text-red-500">*</span> </label> <input type="text" id="des-sub2-name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. Luca">
+           </div>
+           <div><label for="des-sub2-surname" class="block text-sm font-medium text-gray-700 mb-2"> Cognome <span class="text-red-500">*</span> </label> <input type="text" id="des-sub2-surname" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. Neri">
+           </div>
+           <div><label for="des-sub2-email" class="block text-sm font-medium text-gray-700 mb-2"> Email <span class="text-red-500">*</span> </label> <input type="email" id="des-sub2-email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. luca.neri@azienda.it">
+           </div>
+           <div><label for="des-sub2-phone" class="block text-sm font-medium text-gray-700 mb-2"> Telefono <span class="text-red-500">*</span> </label> <input type="tel" id="des-sub2-phone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="es. +39 333 5551234">
+           </div>
+          </div>
+         </div><!-- Note -->
+         <div><label for="des-external-reason" class="block text-sm font-medium text-gray-700 mb-2"> Motivazione (se referente esterno) </label> <textarea id="des-external-reason" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Indicare le motivazioni se il referente è esterno all'azienda"></textarea>
+         </div>
+         <div class="flex items-center space-x-4 pt-4 border-t border-gray-200"><button type="submit" id="save-designation-btn" class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"> 💾 Salva Designazione </button>
+          <div id="designation-save-status" class="text-sm font-medium"></div>
+         </div>
+        </form>
+       </div>
+      </div>
+     </section><!-- API Settings Section -->
      <section id="api-settings-section" class="section-content hidden">
       <h2 class="text-3xl font-bold text-gray-800 mb-6">Impostazioni API Supabase</h2>
       <div class="bg-white rounded-xl shadow-md p-8 max-w-4xl">
@@ -304,8 +687,7 @@
         </div>
         <p class="text-gray-600">Inserisci le credenziali del tuo progetto Supabase per connettere la piattaforma al database cloud.</p>
        </div>
-       <div id="api-connection-status" class="hidden mb-6 p-4 rounded-lg"><!-- Status will be inserted here -->
-       </div>
+       <div id="api-connection-status" class="hidden mb-6 p-4 rounded-lg"></div>
        <form id="api-settings-form" onsubmit="saveAPISettings(event)" class="space-y-6 mb-8">
         <div><label class="block text-sm font-medium text-gray-700 mb-2"> Supabase URL <span class="text-red-500">*</span> </label> <input type="url" id="supabase-url" placeholder="https://xxx.supabase.co" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
         </div>
@@ -313,10 +695,10 @@
         </div>
         <div class="flex space-x-4"><button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"> Salva e Connetti </button> <button type="button" onclick="testAPIConnection()" class="px-6 py-3 border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"> Testa Connessione </button>
         </div>
-       </form><!-- SQL Setup Section -->
+       </form><!-- SQL Setup -->
        <div class="border-t border-gray-200 pt-8">
         <div class="mb-4">
-         <h4 class="text-lg font-bold text-gray-800 mb-2">🛠️ Setup Database (VERSIONE 3.0)</h4>
+         <h4 class="text-lg font-bold text-gray-800 mb-2">��️ Setup Database (VERSIONE 3.0)</h4>
          <p class="text-sm text-gray-600 mb-4"><strong>⚠️ IMPORTANTE:</strong> Script aggiornato con supporto per <strong>Configurazione Rete</strong> e <strong>Designazione CSIRT</strong>.</p>
          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
           <div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-gray-700">Script SQL Database (VERSIONE 3.0)</span> <button onclick="copySQLScript()" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"> 📋 Copia Script </button>
@@ -466,45 +848,47 @@ CREATE TABLE csirt_designations (
         </div>
        </div>
       </div>
-     </section><!-- Rest of sections remain the same --> <!-- Companies, Incidents, Notifications, CSIRT Profile, Network, Audit sections --> <!-- I'll continue with the key updated JavaScript function -->
+     </section>
     </main>
    </div>
   </div>
   <script>
-    // Supabase Client
+    // === GLOBAL STATE ===
     let supabase = null;
     let currentUser = null;
 
-    // Demo users for testing
     const DEMO_USERS = [
       { email: 'admin@csirt.it', password: 'admin123', role: 'admin', name: 'Admin Sistema', company: null },
       { email: 'csirt@hub.it', password: 'csirt123', role: 'csirt', name: 'Marco Rossi', company: null },
       { email: 'azienda@test.it', password: 'azienda123', role: 'azienda', name: 'Giuseppe Verdi', company: 'Azienda Test SRL' }
     ];
 
-    // Initialize on page load
+    // Log per debug credenziali
+    console.log('🔐 Credenziali disponibili:', DEMO_USERS);
+
+    // === INITIALIZATION ===
     document.addEventListener('DOMContentLoaded', function() {
       checkExistingSession();
       loadAPISettings();
     });
 
-    // [Previous functions remain the same: checkExistingSession, handleLogin, showMainApp, etc.]
-    
-    // ===== LOGIN HANDLER =====
-    
+    // === LOGIN FUNCTIONS ===
     function handleLogin(event) {
       event.preventDefault();
       
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value.trim();
       const role = document.getElementById('login-role').value;
       
-      // Check demo credentials
+      console.log('🔍 Tentativo login con:', { email, password, role });
+      
       const user = DEMO_USERS.find(u => 
         u.email === email && 
         u.password === password && 
         u.role === role
       );
+      
+      console.log('👤 Utente trovato:', user);
       
       if (user) {
         currentUser = {
@@ -514,12 +898,45 @@ CREATE TABLE csirt_designations (
           company: user.company
         };
         
-        // Save session
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        
+        console.log('✅ Login riuscito!', currentUser);
         showMainApp();
       } else {
-        alert('Credenziali non valide. Verifica email, password e ruolo.');
+        console.log('❌ Login fallito - credenziali non valide');
+        console.log('📋 Credenziali inserite:', { email, password, role });
+        console.log('📋 Credenziali disponibili:', DEMO_USERS);
+        
+        // Rimuovi messaggi precedenti
+        const existingError = document.querySelector('#login-error-message');
+        if (existingError) existingError.remove();
+        
+        // Messaggio di errore dettagliato
+        const statusDiv = document.createElement('div');
+        statusDiv.id = 'login-error-message';
+        statusDiv.className = 'mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm';
+        statusDiv.innerHTML = `
+          <div class="flex items-start space-x-2">
+            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+            <div>
+              <strong class="font-semibold">❌ Credenziali non valide</strong>
+              <div class="mt-2 space-y-1">
+                <div>Email: ${email ? '✓ Inserita' : '✗ Mancante'}</div>
+                <div>Password: ${password ? '✓ Inserita' : '✗ Mancante'}</div>
+                <div>Ruolo: ${role ? '✓ Selezionato (' + role + ')' : '✗ Non selezionato'}</div>
+              </div>
+              <div class="mt-3 text-xs">
+                <strong>💡 Suggerimento:</strong> Verifica che email, password e ruolo corrispondano esattamente alle credenziali fornite.
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Aggiungi il messaggio dopo il form
+        document.getElementById('login-form').appendChild(statusDiv);
+        
+        setTimeout(() => statusDiv.remove(), 6000);
       }
     }
     
@@ -532,11 +949,9 @@ CREATE TABLE csirt_designations (
     }
     
     function showMainApp() {
-      // Hide login, show main app
       document.getElementById('login-screen').classList.add('hidden');
       document.getElementById('main-app').classList.remove('hidden');
       
-      // Update user info
       document.getElementById('user-name').textContent = currentUser.name;
       
       const roleLabels = {
@@ -546,13 +961,9 @@ CREATE TABLE csirt_designations (
       };
       document.getElementById('user-role').textContent = roleLabels[currentUser.role];
       
-      // Filter sidebar based on role
       filterSidebarByRole();
-      
-      // Load dashboard data
       loadDashboardData();
       
-      // Show CSIRT-specific cards if role is csirt
       if (currentUser.role === 'csirt') {
         document.getElementById('csirt-dashboard-cards').classList.remove('hidden');
       }
@@ -578,41 +989,50 @@ CREATE TABLE csirt_designations (
       document.getElementById('login-form').reset();
     }
     
+    // === NAVIGATION ===
     function showSection(sectionName) {
-      // Hide all sections
       document.querySelectorAll('.section-content').forEach(section => {
         section.classList.add('hidden');
       });
       
-      // Remove active state from all nav items
       document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('bg-blue-50', 'text-blue-600', 'font-medium');
       });
       
-      // Show selected section
       const section = document.getElementById(sectionName + '-section');
       if (section) {
         section.classList.remove('hidden');
       }
       
-      // Set active state on nav item
-      event.target.closest('.nav-item').classList.add('bg-blue-50', 'text-blue-600', 'font-medium');
+      if (event && event.target) {
+        event.target.closest('.nav-item').classList.add('bg-blue-50', 'text-blue-600', 'font-medium');
+      }
       
-      // Load data for specific sections
       if (sectionName === 'companies') {
         loadCompanies();
       } else if (sectionName === 'incidents') {
         loadIncidents();
+        loadCompaniesForDropdowns();
+      } else if (sectionName === 'notifications') {
+        loadNotifications();
+        loadIncidentsForDropdown();
       } else if (sectionName === 'users') {
         loadUsers();
-        loadCompaniesForDropdown();
+        loadCompaniesForDropdowns();
+      } else if (sectionName === 'audit') {
+        loadAudits();
+        loadCompaniesForDropdowns();
+      } else if (sectionName === 'designation-detail') {
+        loadCompaniesForDropdowns();
+      } else if (sectionName === 'csirt-profile') {
+        loadCSIRTProfile();
       } else if (sectionName === 'network') {
         loadNetworkConfig();
       }
     }
     
+    // === DASHBOARD ===
     function loadDashboardData() {
-      // Load from localStorage for now
       const companies = JSON.parse(localStorage.getItem('companies') || '[]');
       const incidents = JSON.parse(localStorage.getItem('incidents') || '[]');
       const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
@@ -625,11 +1045,9 @@ CREATE TABLE csirt_designations (
       const pendingNotifications = notifications.filter(n => n.status === 'pending');
       document.getElementById('pending-notifications').textContent = pendingNotifications.length;
       
-      // Calculate compliance score (placeholder)
       const complianceScore = companies.length > 0 ? 85 : 0;
       document.getElementById('compliance-score').textContent = complianceScore + '%';
       
-      // Load recent activity
       loadRecentActivity();
     }
     
@@ -642,7 +1060,6 @@ CREATE TABLE csirt_designations (
         return;
       }
       
-      // Show last 5 incidents
       const recentIncidents = incidents.slice(-5).reverse();
       
       activityContainer.innerHTML = recentIncidents.map(inc => `
@@ -661,150 +1078,12 @@ CREATE TABLE csirt_designations (
       `).join('');
     }
     
-    // ===== API SETTINGS =====
-    
-    function loadAPISettings() {
-      const savedUrl = localStorage.getItem('supabase_url');
-      const savedKey = localStorage.getItem('supabase_key');
-      
-      if (savedUrl) document.getElementById('supabase-url').value = savedUrl;
-      if (savedKey) document.getElementById('supabase-key').value = savedKey;
-      
-      if (savedUrl && savedKey) {
-        initializeSupabase(savedUrl, savedKey);
-      }
-    }
-    
-    function saveAPISettings(event) {
+    // === COMPANIES ===
+    async function handleCompanySubmit(event) {
       event.preventDefault();
       
-      const url = document.getElementById('supabase-url').value.trim();
-      const key = document.getElementById('supabase-key').value.trim();
-      
-      localStorage.setItem('supabase_url', url);
-      localStorage.setItem('supabase_key', key);
-      
-      initializeSupabase(url, key);
-      
-      showStatus('api-connection-status', 'Connessione salvata con successo!', 'success');
-    }
-    
-    function initializeSupabase(url, key) {
-      try {
-        supabase = window.supabase.createClient(url, key);
-        console.log('✅ Supabase client inizializzato');
-        
-        document.getElementById('api-status').classList.remove('hidden');
-        document.getElementById('api-status').textContent = '✓ API Connessa';
-        document.getElementById('api-status').className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
-        
-        testAPIConnection();
-      } catch (error) {
-        console.error('❌ Errore inizializzazione Supabase:', error);
-        document.getElementById('api-status').textContent = '✗ API Non Connessa';
-        document.getElementById('api-status').className = 'px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800';
-      }
-    }
-    
-    async function testAPIConnection() {
-      if (!supabase) {
-        showStatus('api-connection-status', 'Inserisci prima le credenziali API', 'error');
-        return;
-      }
-      
-      try {
-        const { data, error } = await supabase.from('csirt_companies').select('count');
-        
-        if (error) throw error;
-        
-        showStatus('api-connection-status', '✅ Connessione al database riuscita!', 'success');
-        console.log('✅ Test connessione Supabase OK');
-      } catch (error) {
-        showStatus('api-connection-status', '❌ Errore connessione: ' + error.message, 'error');
-        console.error('❌ Test connessione fallito:', error);
-      }
-    }
-    
-    function showStatus(elementId, message, type) {
-      const element = document.getElementById(elementId);
-      element.classList.remove('hidden');
-      element.innerHTML = `
-        <div class="${type === 'success' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'} rounded-lg p-4">
-          ${message}
-        </div>
-      `;
-    }
-    
-    function copySQLScript() {
-      const script = document.getElementById('sql-script').textContent;
-      navigator.clipboard.writeText(script).then(() => {
-        alert('✅ Script SQL copiato negli appunti!');
-      });
-    }
-    
-    // ===== PLACEHOLDER FUNCTIONS =====
-    
-    function loadCompanies() {
-      console.log('Loading companies...');
-    }
-    
-    function loadIncidents() {
-      console.log('Loading incidents...');
-    }
-    
-    function loadUsers() {
-      console.log('Loading users...');
-    }
-    
-    function loadCompaniesForDropdown() {
-      console.log('Loading companies for dropdown...');
-    }
-    
-    function cancelEditUser() {
-      document.getElementById('new-user-form').reset();
-      document.getElementById('edit-user-id').value = '';
-      document.getElementById('form-title').innerHTML = '➕ Aggiungi Nuovo Utente';
-      document.getElementById('save-user-btn').innerHTML = '💾 Salva Utente';
-    }
-    
-    function renderNetworkDiagram(data) {
-      console.log('Rendering network diagram with:', data);
-      const container = document.getElementById('network-visual-diagram');
-      if (container) {
-        container.innerHTML = `
-          <div class="bg-white p-8 rounded-lg text-center">
-            <p class="text-lg font-semibold text-gray-700">Diagramma rete configurato</p>
-            <p class="text-sm text-gray-500 mt-2">Topologia: ${data.topology}, Dimensione: ${data.size}</p>
-          </div>
-        `;
-      }
-    }
-    
-    function renderNetworkHierarchy(data) {
-      console.log('Rendering network hierarchy with:', data);
-      const container = document.getElementById('network-hierarchy-view');
-      if (container) {
-        container.innerHTML = `
-          <div class="bg-white p-8 rounded-lg">
-            <h4 class="font-bold text-lg mb-4">Gerarchia Rete</h4>
-            <ul class="space-y-2 text-sm text-gray-700">
-              <li>🌐 ISP Primario: ${data.isp_primary}</li>
-              <li>🔒 Firewall: ${data.firewall_type}</li>
-              <li>📊 Subnets: ${data.subnets}</li>
-              <li>📶 Bandwidth: ${data.bandwidth}</li>
-            </ul>
-          </div>
-        `;
-      }
-    }
-    
-    // ===== NETWORK CONFIGURATION WITH SUPABASE =====
-    
-    async function handleNetworkSubmit(event) {
-      event.preventDefault();
-      
-      const btn = document.getElementById('save-network-btn');
-      const status = document.getElementById('network-status');
+      const btn = document.getElementById('save-company-btn');
+      const status = document.getElementById('company-save-status');
       
       btn.disabled = true;
       btn.textContent = '⏳ Salvataggio...';
@@ -812,229 +1091,745 @@ CREATE TABLE csirt_designations (
       status.className = 'text-sm font-medium text-blue-600';
       
       try {
-        const networkData = {
-          topology: document.getElementById('net-topology').value,
-          size: document.getElementById('net-size').value,
-          subnets: parseInt(document.getElementById('net-subnets').value),
-          vlans: parseInt(document.getElementById('net-vlans').value) || 0,
-          firewall_type: document.getElementById('firewall-type').value,
-          firewall_vendor: document.getElementById('firewall-vendor').value.trim(),
-          has_ids: document.getElementById('has-ids').checked,
-          has_waf: document.getElementById('has-waf').checked,
-          isp_primary: document.getElementById('isp-primary').value.trim(),
-          isp_secondary: document.getElementById('isp-secondary').value.trim(),
-          bandwidth: document.getElementById('bandwidth').value.trim(),
-          has_vpn: document.getElementById('has-vpn').checked,
-          notes: document.getElementById('network-notes').value.trim()
+        const companyData = {
+          name: document.getElementById('company-name').value.trim(),
+          vat: document.getElementById('company-vat').value.trim(),
+          sector: document.getElementById('company-sector').value,
+          category: document.getElementById('company-category').value,
+          address: document.getElementById('company-address').value.trim(),
+          email: document.getElementById('company-email').value.trim(),
+          phone: document.getElementById('company-phone').value.trim()
         };
         
-        console.log('📤 Salvataggio configurazione rete:', networkData);
+        const editId = document.getElementById('edit-company-id').value;
         
         if (supabase) {
-          // Get company ID for current user
-          let companyId = null;
-          
-          if (currentUser.role === 'azienda') {
-            const { data: companyData } = await supabase
+          if (editId) {
+            const { data, error } = await supabase
               .from('csirt_companies')
-              .select('id')
-              .eq('name', currentUser.company)
-              .single();
-            
-            companyId = companyData?.id;
-          } else if (currentUser.role === 'csirt' || currentUser.role === 'admin') {
-            // For now, save without company_id or add UI to select company
-            // You can extend this to allow selecting which company config to save
-          }
-          
-          // Check if configuration already exists
-          let existingConfig = null;
-          if (companyId) {
-            const { data } = await supabase
-              .from('csirt_network_configs')
-              .select('id')
-              .eq('company_id', companyId)
-              .maybeSingle();
-            
-            existingConfig = data;
-          }
-          
-          if (existingConfig) {
-            // Update existing configuration
-            const { data, error } = await supabase
-              .from('csirt_network_configs')
-              .update({
-                ...networkData,
-                updated_at: new Date().toISOString()
-              })
-              .eq('id', existingConfig.id)
+              .update(companyData)
+              .eq('id', editId)
               .select();
             
             if (error) throw error;
             
-            console.log('✅ Configurazione rete aggiornata su Supabase:', data);
-            status.textContent = '✅ Configurazione aggiornata su Supabase!';
+            const localCompanies = JSON.parse(localStorage.getItem('companies') || '[]');
+            const index = localCompanies.findIndex(c => c.id === editId);
+            if (index !== -1) {
+              localCompanies[index] = { ...companyData, id: editId };
+              localStorage.setItem('companies', JSON.stringify(localCompanies));
+            }
+            
+            status.textContent = '✅ Azienda aggiornata su Supabase!';
           } else {
-            // Insert new configuration
             const { data, error } = await supabase
-              .from('csirt_network_configs')
-              .insert([{
-                ...networkData,
-                company_id: companyId
-              }])
+              .from('csirt_companies')
+              .insert([companyData])
               .select();
             
             if (error) throw error;
             
-            console.log('✅ Configurazione rete salvata su Supabase:', data);
-            status.textContent = '✅ Configurazione salvata su Supabase!';
+            const localCompanies = JSON.parse(localStorage.getItem('companies') || '[]');
+            localCompanies.push({ ...companyData, id: data[0].id });
+            localStorage.setItem('companies', JSON.stringify(localCompanies));
+            
+            status.textContent = '✅ Azienda salvata su Supabase!';
           }
         } else {
-          console.log('⚠️ Supabase non connesso, salvo solo in localStorage');
-          status.textContent = '✅ Configurazione salvata localmente!';
+          const localCompanies = JSON.parse(localStorage.getItem('companies') || '[]');
+          
+          if (editId) {
+            const index = localCompanies.findIndex(c => c.id === editId);
+            if (index !== -1) {
+              localCompanies[index] = { ...companyData, id: editId };
+            }
+          } else {
+            companyData.id = Date.now().toString();
+            localCompanies.push(companyData);
+          }
+          
+          localStorage.setItem('companies', JSON.stringify(localCompanies));
+          status.textContent = '✅ Azienda salvata localmente!';
         }
-        
-        // ALWAYS save to localStorage as cache/backup
-        localStorage.setItem('network_config', JSON.stringify(networkData));
-        console.log('✅ Configurazione rete salvata anche in localStorage (cache)');
         
         status.className = 'text-sm font-medium text-green-600';
         
-        // Render visualizations immediately
-        console.log('🎨 Rendering visualizzazioni...');
-        renderNetworkDiagram(networkData);
-        renderNetworkHierarchy(networkData);
-        
-        // Auto-switch to diagram tab to show results
         setTimeout(() => {
-          showNetworkTab('diagram');
-        }, 2000);
+          document.getElementById('new-company-form').reset();
+          document.getElementById('edit-company-id').value = '';
+          document.getElementById('company-form-title').textContent = '➕ Aggiungi Nuova Azienda';
+          loadCompanies();
+          loadDashboardData();
+        }, 1500);
         
       } catch (error) {
-        console.error('❌ Errore salvataggio rete:', error);
+        console.error('❌ Errore salvataggio azienda:', error);
         status.textContent = '❌ ' + error.message;
         status.className = 'text-sm font-medium text-red-600';
       } finally {
         btn.disabled = false;
-        btn.textContent = '💾 Salva Configurazione';
+        btn.textContent = '💾 Salva Azienda';
       }
     }
     
-    // Load network config when switching tabs
-    async function loadNetworkConfig() {
-      console.log('🔄 Caricamento configurazione rete...');
+    async function loadCompanies() {
+      let companies = [];
       
-      let networkData = null;
-      
-      if (supabase && currentUser) {
+      if (supabase) {
         try {
-          let companyId = null;
+          const { data, error } = await supabase
+            .from('csirt_companies')
+            .select('*')
+            .order('created_at', { ascending: false });
           
-          if (currentUser.role === 'azienda') {
-            const { data: companyData } = await supabase
-              .from('csirt_companies')
-              .select('id')
-              .eq('name', currentUser.company)
-              .single();
-            
-            companyId = companyData?.id;
-          }
-          
-          if (companyId) {
-            const { data, error } = await supabase
-              .from('csirt_network_configs')
-              .select('*')
-              .eq('company_id', companyId)
-              .maybeSingle();
-            
-            if (!error && data) {
-              networkData = data;
-              console.log('✅ Configurazione caricata da Supabase');
-              
-              // Update localStorage cache
-              localStorage.setItem('network_config', JSON.stringify(networkData));
-            }
+          if (!error && data) {
+            companies = data;
+            localStorage.setItem('companies', JSON.stringify(companies));
           }
         } catch (error) {
           console.error('❌ Errore caricamento da Supabase:', error);
         }
       }
       
-      // Fallback to localStorage if Supabase failed or not available
-      if (!networkData) {
-        const localData = localStorage.getItem('network_config');
-        if (localData) {
-          networkData = JSON.parse(localData);
-          console.log('✅ Configurazione caricata da localStorage (cache)');
+      if (companies.length === 0) {
+        companies = JSON.parse(localStorage.getItem('companies') || '[]');
+      }
+      
+      const tbody = document.getElementById('companies-table-body');
+      
+      if (companies.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Nessuna azienda registrata</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = companies.map(company => `
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="font-medium text-gray-900">${company.name}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${company.vat}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${company.sector}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-medium rounded-full ${company.category === 'essenziale' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">
+              ${company.category}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <div>${company.email}</div>
+            <div>${company.phone}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+            <button onclick="editCompany('${company.id}')" class="text-blue-600 hover:text-blue-800">✏️ Modifica</button>
+            <button onclick="deleteCompany('${company.id}')" class="text-red-600 hover:text-red-800">🗑️ Elimina</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function editCompany(id) {
+      const companies = JSON.parse(localStorage.getItem('companies') || '[]');
+      const company = companies.find(c => c.id === id);
+      
+      if (company) {
+        document.getElementById('company-name').value = company.name;
+        document.getElementById('company-vat').value = company.vat;
+        document.getElementById('company-sector').value = company.sector;
+        document.getElementById('company-category').value = company.category;
+        document.getElementById('company-address').value = company.address || '';
+        document.getElementById('company-email').value = company.email;
+        document.getElementById('company-phone').value = company.phone;
+        document.getElementById('edit-company-id').value = id;
+        document.getElementById('company-form-title').textContent = '✏️ Modifica Azienda';
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+    
+    async function deleteCompany(id) {
+      if (!confirm('Sei sicuro di voler eliminare questa azienda?')) return;
+      
+      try {
+        if (supabase) {
+          const { error } = await supabase
+            .from('csirt_companies')
+            .delete()
+            .eq('id', id);
+          
+          if (error) throw error;
+        }
+        
+        const companies = JSON.parse(localStorage.getItem('companies') || '[]');
+        const filtered = companies.filter(c => c.id !== id);
+        localStorage.setItem('companies', JSON.stringify(filtered));
+        
+        loadCompanies();
+        loadDashboardData();
+      } catch (error) {
+        console.error('❌ Errore eliminazione azienda:', error);
+        alert('Errore durante l\'eliminazione: ' + error.message);
+      }
+    }
+    
+    function cancelEditCompany() {
+      document.getElementById('new-company-form').reset();
+      document.getElementById('edit-company-id').value = '';
+      document.getElementById('company-form-title').textContent = '➕ Aggiungi Nuova Azienda';
+    }
+    
+    // === INCIDENTS ===
+    async function handleIncidentSubmit(event) {
+      event.preventDefault();
+      
+      const btn = document.getElementById('save-incident-btn');
+      const status = document.getElementById('incident-save-status');
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Salvataggio...';
+      status.textContent = 'Attendere...';
+      status.className = 'text-sm font-medium text-blue-600';
+      
+      try {
+        const companies = JSON.parse(localStorage.getItem('companies') || '[]');
+        const companyId = document.getElementById('incident-company').value;
+        const company = companies.find(c => c.id === companyId);
+        
+        const incidentData = {
+          title: document.getElementById('incident-title').value.trim(),
+          company: company ? company.name : '',
+          company_id: companyId,
+          detectionDate: document.getElementById('incident-date').value,
+          category: document.getElementById('incident-category').value,
+          severity: document.getElementById('incident-severity').value,
+          status: document.getElementById('incident-status').value,
+          affectedSystems: document.getElementById('incident-systems').value.trim(),
+          usersAffected: parseInt(document.getElementById('incident-users').value) || 0,
+          dataCompromised: document.getElementById('incident-data-compromised').value.trim(),
+          impactDescription: document.getElementById('incident-impact').value.trim(),
+          technicalDetails: document.getElementById('incident-technical').value.trim(),
+          containmentActions: document.getElementById('incident-containment').value.trim(),
+          notes: document.getElementById('incident-notes').value.trim()
+        };
+        
+        const editId = document.getElementById('edit-incident-id').value;
+        
+        if (supabase) {
+          const supabaseData = {
+            title: incidentData.title,
+            company_id: incidentData.company_id,
+            detection_date: incidentData.detectionDate,
+            category: incidentData.category,
+            severity: incidentData.severity,
+            status: incidentData.status,
+            affected_systems: incidentData.affectedSystems,
+            users_affected: incidentData.usersAffected,
+            data_compromised: incidentData.dataCompromised,
+            impact_description: incidentData.impactDescription,
+            technical_details: incidentData.technicalDetails,
+            containment_actions: incidentData.containmentActions,
+            notes: incidentData.notes
+          };
+          
+          if (editId) {
+            const { data, error } = await supabase
+              .from('csirt_incidents')
+              .update(supabaseData)
+              .eq('id', editId)
+              .select();
+            
+            if (error) throw error;
+            
+            const localIncidents = JSON.parse(localStorage.getItem('incidents') || '[]');
+            const index = localIncidents.findIndex(i => i.id === editId);
+            if (index !== -1) {
+              localIncidents[index] = { ...incidentData, id: editId };
+              localStorage.setItem('incidents', JSON.stringify(localIncidents));
+            }
+            
+            status.textContent = '✅ Incidente aggiornato su Supabase!';
+          } else {
+            const { data, error } = await supabase
+              .from('csirt_incidents')
+              .insert([supabaseData])
+              .select();
+            
+            if (error) throw error;
+            
+            const localIncidents = JSON.parse(localStorage.getItem('incidents') || '[]');
+            localIncidents.push({ ...incidentData, id: data[0].id });
+            localStorage.setItem('incidents', JSON.stringify(localIncidents));
+            
+            status.textContent = '✅ Incidente salvato su Supabase!';
+          }
+        } else {
+          const localIncidents = JSON.parse(localStorage.getItem('incidents') || '[]');
+          
+          if (editId) {
+            const index = localIncidents.findIndex(i => i.id === editId);
+            if (index !== -1) {
+              localIncidents[index] = { ...incidentData, id: editId };
+            }
+          } else {
+            incidentData.id = Date.now().toString();
+            localIncidents.push(incidentData);
+          }
+          
+          localStorage.setItem('incidents', JSON.stringify(localIncidents));
+          status.textContent = '✅ Incidente salvato localmente!';
+        }
+        
+        status.className = 'text-sm font-medium text-green-600';
+        
+        setTimeout(() => {
+          document.getElementById('new-incident-form').reset();
+          document.getElementById('edit-incident-id').value = '';
+          document.getElementById('incident-form-title').textContent = '➕ Registra Nuovo Incidente';
+          loadIncidents();
+          loadDashboardData();
+        }, 1500);
+        
+      } catch (error) {
+        console.error('❌ Errore salvataggio incidente:', error);
+        status.textContent = '❌ ' + error.message;
+        status.className = 'text-sm font-medium text-red-600';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Salva Incidente';
+      }
+    }
+    
+    async function loadIncidents() {
+      let incidents = [];
+      
+      if (supabase) {
+        try {
+          const { data, error } = await supabase
+            .from('csirt_incidents')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (!error && data) {
+            const companies = JSON.parse(localStorage.getItem('companies') || '[]');
+            
+            incidents = data.map(inc => {
+              const company = companies.find(c => c.id === inc.company_id);
+              return {
+                id: inc.id,
+                title: inc.title,
+                company: company ? company.name : 'N/D',
+                company_id: inc.company_id,
+                detectionDate: inc.detection_date,
+                category: inc.category,
+                severity: inc.severity,
+                status: inc.status,
+                affectedSystems: inc.affected_systems,
+                usersAffected: inc.users_affected,
+                dataCompromised: inc.data_compromised,
+                impactDescription: inc.impact_description,
+                technicalDetails: inc.technical_details,
+                containmentActions: inc.containment_actions,
+                notes: inc.notes
+              };
+            });
+            
+            localStorage.setItem('incidents', JSON.stringify(incidents));
+          }
+        } catch (error) {
+          console.error('❌ Errore caricamento da Supabase:', error);
         }
       }
       
-      return networkData;
+      if (incidents.length === 0) {
+        incidents = JSON.parse(localStorage.getItem('incidents') || '[]');
+      }
+      
+      const tbody = document.getElementById('incidents-table-body');
+      
+      if (incidents.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Nessun incidente registrato</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = incidents.map(inc => `
+        <tr>
+          <td class="px-6 py-4">
+            <div class="font-medium text-gray-900">${inc.title}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${inc.company}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(inc.detectionDate).toLocaleDateString('it-IT')}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="status-badge severity-${inc.severity}">${inc.severity.toUpperCase()}</span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="status-badge status-${inc.status}">${inc.status.toUpperCase()}</span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+            <button onclick="editIncident('${inc.id}')" class="text-blue-600 hover:text-blue-800">✏️ Modifica</button>
+            <button onclick="deleteIncident('${inc.id}')" class="text-red-600 hover:text-red-800">🗑️ Elimina</button>
+          </td>
+        </tr>
+      `).join('');
     }
     
-    function showNetworkTab(tabName) {
-      console.log('📑 Cambio tab verso:', tabName);
+    function editIncident(id) {
+      const incidents = JSON.parse(localStorage.getItem('incidents') || '[]');
+      const incident = incidents.find(i => i.id === id);
       
-      // Hide all tabs
-      document.querySelectorAll('.network-tab-content').forEach(tab => {
-        tab.classList.add('hidden');
-      });
-      
-      // Remove active state from all tab buttons
-      document.querySelectorAll('.network-tab').forEach(btn => {
-        btn.classList.remove('border-blue-600', 'text-blue-600');
-        btn.classList.add('border-transparent', 'text-gray-500');
-      });
-      
-      // Show selected tab
-      const selectedTab = document.getElementById('network-tab-' + tabName);
-      if (selectedTab) {
-        selectedTab.classList.remove('hidden');
-        console.log('✅ Tab mostrato:', tabName);
+      if (incident) {
+        document.getElementById('incident-title').value = incident.title;
+        document.getElementById('incident-company').value = incident.company_id;
+        document.getElementById('incident-date').value = incident.detectionDate;
+        document.getElementById('incident-category').value = incident.category;
+        document.getElementById('incident-severity').value = incident.severity;
+        document.getElementById('incident-status').value = incident.status;
+        document.getElementById('incident-systems').value = incident.affectedSystems;
+        document.getElementById('incident-users').value = incident.usersAffected;
+        document.getElementById('incident-data-compromised').value = incident.dataCompromised || '';
+        document.getElementById('incident-impact').value = incident.impactDescription;
+        document.getElementById('incident-technical').value = incident.technicalDetails;
+        document.getElementById('incident-containment').value = incident.containmentActions;
+        document.getElementById('incident-notes').value = incident.notes || '';
+        document.getElementById('edit-incident-id').value = id;
+        document.getElementById('incident-form-title').textContent = '✏️ Modifica Incidente';
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
+    }
+    
+    async function deleteIncident(id) {
+      if (!confirm('Sei sicuro di voler eliminare questo incidente?')) return;
       
-      // Set active state on selected button
-      const activeBtn = document.getElementById('tab-' + tabName);
-      if (activeBtn) {
-        activeBtn.classList.remove('border-transparent', 'text-gray-500');
-        activeBtn.classList.add('border-blue-600', 'text-blue-600');
+      try {
+        if (supabase) {
+          const { error } = await supabase
+            .from('csirt_incidents')
+            .delete()
+            .eq('id', id);
+          
+          if (error) throw error;
+        }
+        
+        const incidents = JSON.parse(localStorage.getItem('incidents') || '[]');
+        const filtered = incidents.filter(i => i.id !== id);
+        localStorage.setItem('incidents', JSON.stringify(filtered));
+        
+        loadIncidents();
+        loadDashboardData();
+      } catch (error) {
+        console.error('❌ Errore eliminazione incidente:', error);
+        alert('Errore durante l\'eliminazione: ' + error.message);
       }
+    }
+    
+    function cancelEditIncident() {
+      document.getElementById('new-incident-form').reset();
+      document.getElementById('edit-incident-id').value = '';
+      document.getElementById('incident-form-title').textContent = '➕ Registra Nuovo Incidente';
+    }
+    
+    // === NOTIFICATIONS ===
+    async function handleNotificationSubmit(event) {
+      event.preventDefault();
       
-      // Load and render data when switching to diagram or hierarchy
-      if (tabName === 'diagram' || tabName === 'hierarchy') {
-        loadNetworkConfig().then(networkData => {
-          if (networkData && Object.keys(networkData).length > 0) {
-            console.log('✅ Dati validi - rendering in corso...');
-            if (tabName === 'diagram') {
-              renderNetworkDiagram(networkData);
-            } else {
-              renderNetworkHierarchy(networkData);
-            }
-          } else {
-            console.log('⚠️ Nessun dato trovato - mostra messaggio vuoto');
-            const container = tabName === 'diagram' 
-              ? document.getElementById('network-visual-diagram')
-              : document.getElementById('network-hierarchy-view');
+      const btn = document.getElementById('save-notification-btn');
+      const status = document.getElementById('notification-save-status');
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Salvataggio...';
+      status.textContent = 'Attendere...';
+      status.className = 'text-sm font-medium text-blue-600';
+      
+      try {
+        const incidents = JSON.parse(localStorage.getItem('incidents') || '[]');
+        const incidentId = document.getElementById('notification-incident').value;
+        const incident = incidents.find(i => i.id === incidentId);
+        
+        const notificationData = {
+          incidentId: incidentId,
+          incidentTitle: incident ? incident.title : '',
+          type: document.getElementById('notification-type').value,
+          status: document.getElementById('notification-status').value,
+          notificationDate: document.getElementById('notification-date').value,
+          recipient: document.getElementById('notification-recipient').value.trim()
+        };
+        
+        if (supabase) {
+          const supabaseData = {
+            incident_id: notificationData.incidentId,
+            type: notificationData.type,
+            status: notificationData.status,
+            notification_date: notificationData.notificationDate,
+            recipient: notificationData.recipient
+          };
+          
+          const { data, error } = await supabase
+            .from('csirt_notifications')
+            .insert([supabaseData])
+            .select();
+          
+          if (error) throw error;
+          
+          const localNotifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+          localNotifications.push({ ...notificationData, id: data[0].id });
+          localStorage.setItem('notifications', JSON.stringify(localNotifications));
+          
+          status.textContent = '✅ Notifica salvata su Supabase!';
+        } else {
+          notificationData.id = Date.now().toString();
+          const localNotifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+          localNotifications.push(notificationData);
+          localStorage.setItem('notifications', JSON.stringify(localNotifications));
+          
+          status.textContent = '✅ Notifica salvata localmente!';
+        }
+        
+        status.className = 'text-sm font-medium text-green-600';
+        
+        setTimeout(() => {
+          document.getElementById('new-notification-form').reset();
+          loadNotifications();
+          loadDashboardData();
+        }, 1500);
+        
+      } catch (error) {
+        console.error('❌ Errore salvataggio notifica:', error);
+        status.textContent = '❌ ' + error.message;
+        status.className = 'text-sm font-medium text-red-600';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Salva Notifica';
+      }
+    }
+    
+    async function loadNotifications() {
+      let notifications = [];
+      
+      if (supabase) {
+        try {
+          const { data, error } = await supabase
+            .from('csirt_notifications')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (!error && data) {
+            const incidents = JSON.parse(localStorage.getItem('incidents') || '[]');
             
-            if (container) {
-              container.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-16 text-center">
-                  <svg class="w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                  </svg>
-                  <p class="text-xl font-semibold text-gray-600 mb-2">Nessuna configurazione salvata</p>
-                  <p class="text-gray-500">Compila e salva la configurazione nel tab "⚙️ Configurazione" per visualizzare ${tabName === 'diagram' ? 'il diagramma' : 'la gerarchia'}</p>
-                </div>
-              `;
-            }
+            notifications = data.map(notif => {
+              const incident = incidents.find(i => i.id === notif.incident_id);
+              return {
+                id: notif.id,
+                incidentId: notif.incident_id,
+                incidentTitle: incident ? incident.title : 'N/D',
+                type: notif.type,
+                status: notif.status,
+                notificationDate: notif.notification_date,
+                recipient: notif.recipient
+              };
+            });
+            
+            localStorage.setItem('notifications', JSON.stringify(notifications));
           }
-        });
+        } catch (error) {
+          console.error('❌ Errore caricamento da Supabase:', error);
+        }
+      }
+      
+      if (notifications.length === 0) {
+        notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+      }
+      
+      const tbody = document.getElementById('notifications-table-body');
+      
+      if (notifications.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Nessuna notifica registrata</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = notifications.map(notif => `
+        <tr>
+          <td class="px-6 py-4">
+            <div class="font-medium text-gray-900">${notif.incidentTitle}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${notif.type}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(notif.notificationDate).toLocaleString('it-IT')}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${notif.recipient}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-medium rounded-full ${notif.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
+              ${notif.status}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <button onclick="deleteNotification('${notif.id}')" class="text-red-600 hover:text-red-800">🗑️ Elimina</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    async function deleteNotification(id) {
+      if (!confirm('Sei sicuro di voler eliminare questa notifica?')) return;
+      
+      try {
+        if (supabase) {
+          const { error } = await supabase
+            .from('csirt_notifications')
+            .delete()
+            .eq('id', id);
+          
+          if (error) throw error;
+        }
+        
+        const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+        const filtered = notifications.filter(n => n.id !== id);
+        localStorage.setItem('notifications', JSON.stringify(filtered));
+        
+        loadNotifications();
+        loadDashboardData();
+      } catch (error) {
+        console.error('❌ Errore eliminazione notifica:', error);
+        alert('Errore durante l\'eliminazione: ' + error.message);
       }
     }
     
-    // [Rest of the JavaScript functions remain the same]
-    // Including: renderNetworkDiagram, renderNetworkHierarchy, etc.
+    // === AUDITS ===
+    async function handleAuditSubmit(event) {
+      event.preventDefault();
+      
+      const btn = document.getElementById('save-audit-btn');
+      const status = document.getElementById('audit-save-status');
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Salvataggio...';
+      status.textContent = 'Attendere...';
+      status.className = 'text-sm font-medium text-blue-600';
+      
+      try {
+        const companies = JSON.parse(localStorage.getItem('companies') || '[]');
+        const companyId = document.getElementById('audit-company').value;
+        const company = companies.find(c => c.id === companyId);
+        
+        const auditData = {
+          title: document.getElementById('audit-title').value.trim(),
+          company: company ? company.name : '',
+          company_id: companyId,
+          auditDate: document.getElementById('audit-date').value,
+          score: parseInt(document.getElementById('audit-score').value),
+          notes: document.getElementById('audit-notes').value.trim()
+        };
+        
+        if (supabase) {
+          const supabaseData = {
+            title: auditData.title,
+            company_id: auditData.company_id,
+            audit_date: auditData.auditDate,
+            score: auditData.score,
+            notes: auditData.notes
+          };
+          
+          const { data, error } = await supabase
+            .from('csirt_audits')
+            .insert([supabaseData])
+            .select();
+          
+          if (error) throw error;
+          
+          const localAudits = JSON.parse(localStorage.getItem('audits') || '[]');
+          localAudits.push({ ...auditData, id: data[0].id });
+          localStorage.setItem('audits', JSON.stringify(localAudits));
+          
+          status.textContent = '✅ Audit salvato su Supabase!';
+        } else {
+          auditData.id = Date.now().toString();
+          const localAudits = JSON.parse(localStorage.getItem('audits') || '[]');
+          localAudits.push(auditData);
+          localStorage.setItem('audits', JSON.stringify(localAudits));
+          
+          status.textContent = '✅ Audit salvato localmente!';
+        }
+        
+        status.className = 'text-sm font-medium text-green-600';
+        
+        setTimeout(() => {
+          document.getElementById('new-audit-form').reset();
+          loadAudits();
+        }, 1500);
+        
+      } catch (error) {
+        console.error('❌ Errore salvataggio audit:', error);
+        status.textContent = '❌ ' + error.message;
+        status.className = 'text-sm font-medium text-red-600';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Salva Audit';
+      }
+    }
     
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a96716c63835267',t:'MTc2NDk2ODExMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    async function loadAudits() {
+      let audits = [];
+      
+      if (supabase) {
+        try {
+          const { data, error } = await supabase
+            .from('csirt_audits')
+            .select('*')
+            .order('created_at', { ascending: false });
+          
+          if (!error && data) {
+            const companies = JSON.parse(localStorage.getItem('companies') || '[]');
+            
+            audits = data.map(audit => {
+              const company = companies.find(c => c.id === audit.company_id);
+              return {
+                id: audit.id,
+                title: audit.title,
+                company: company ? company.name : 'N/D',
+                company_id: audit.company_id,
+                auditDate: audit.audit_date,
+                score: audit.score,
+                notes: audit.notes
+              };
+            });
+            
+            localStorage.setItem('audits', JSON.stringify(audits));
+          }
+        } catch (error) {
+          console.error('❌ Errore caricamento da Supabase:', error);
+        }
+      }
+      
+      if (audits.length === 0) {
+        audits = JSON.parse(localStorage.getItem('audits') || '[]');
+      }
+      
+      const tbody = document.getElementById('audits-table-body');
+      
+      if (audits.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">Nessun audit registrato</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = audits.map(audit => `
+        <tr>
+          <td class="px-6 py-4">
+            <div class="font-medium text-gray-900">${audit.title}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${audit.company}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(audit.auditDate).toLocaleDateString('it-IT')}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-3 py-1 text-sm font-bold rounded-full ${audit.score >= 80 ? 'bg-green-100 text-green-800' : audit.score >= 60 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
+              ${audit.score}%
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <button onclick="deleteAudit('${audit.id}')" class="text-red-600 hover:text-red-800">🗑️ Elimina</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    async function deleteAudit(id) {
+      if (!confirm('Sei sicuro di voler eliminare questo audit?')) return;
+      
+      try {
+        if (supabase) {
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a96a77c4279e898',t:'MTc2NDk3MDMyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
