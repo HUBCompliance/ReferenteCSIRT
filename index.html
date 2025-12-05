@@ -43,7 +43,7 @@
     <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
      <div><label class="block text-sm font-medium text-gray-700 mb-2">Email</label> <input type="email" id="login-email" placeholder="inserisci@email.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
      </div>
-     <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="login-password" placeholder="••••••••" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+     <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="login-password" placeholder="••••������••" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
      </div>
      <div><label class="block text-sm font-medium text-gray-700 mb-2">Profilo</label> <select id="login-role" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required> <option value="">Seleziona il tuo ruolo</option> <option value="admin">👤 Amministratore</option> <option value="csirt">🛡️ Consulente/Referente CSIRT</option> <option value="azienda">🏢 Referente Aziendale</option> </select>
      </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"> Accedi alla Piattaforma </button>
@@ -198,7 +198,31 @@
         </tbody>
        </table>
       </div>
-     </section><!-- API Settings Section (Admin Only) -->
+     </section><!-- Add User Modal -->
+     <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg">
+       <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-gray-800">Nuovo Utente</h3><button onclick="closeUserModal()" class="text-gray-400 hover:text-gray-600">
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+         </svg></button>
+       </div>
+       <form id="user-form" onsubmit="saveUser(event)" class="space-y-4">
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label> <input type="text" id="user-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Mario Rossi">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Email</label> <input type="email" id="user-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="mario.rossi@azienda.it">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="user-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="••••••••">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Ruolo</label> <select id="user-role" onchange="toggleCompanyField()" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"> <option value="">Seleziona ruolo</option> <option value="admin">👤 Amministratore</option> <option value="csirt">🛡️ Consulente/Referente CSIRT</option> <option value="azienda">🏢 Referente Aziendale</option> </select>
+        </div>
+        <div id="company-field" class="hidden"><label class="block text-sm font-medium text-gray-700 mb-2">Azienda Associata</label> <select id="user-company" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"> <option value="">Seleziona azienda</option> <!-- Companies will be loaded here --> </select>
+        </div>
+        <div class="flex space-x-3 pt-4"><button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"> Salva Utente </button> <button type="button" onclick="closeUserModal()" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"> Annulla </button>
+        </div>
+       </form>
+      </div>
+     </div><!-- API Settings Section (Admin Only) -->
      <section id="api-settings-section" class="section-content hidden">
       <h2 class="text-3xl font-bold text-gray-800 mb-6">Impostazioni API Supabase</h2>
       <div class="bg-white rounded-xl shadow-md p-8 max-w-2xl">
@@ -222,11 +246,56 @@
         </div>
        </form>
       </div>
-     </section><!-- Other sections placeholders -->
+     </section><!-- Companies Management Section -->
      <section id="companies-section" class="section-content hidden">
-      <h2 class="text-3xl font-bold text-gray-800 mb-6">Gestione Aziende</h2>
-      <p class="text-gray-600">Sezione aziende - Da implementare con dati filtrati per ruolo</p>
-     </section>
+      <h2 class="text-3xl font-bold text-gray-800 mb-6">Gestione Aziende</h2><button onclick="showAddCompanyModal()" class="mb-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"> + Aggiungi Azienda </button>
+      <div id="companies-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><!-- Companies will be loaded here -->
+      </div>
+     </section><!-- Add Company Modal -->
+     <div id="company-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+       <div class="flex items-center justify-between mb-6">
+        <h3 class="text-2xl font-bold text-gray-800">Nuova Azienda</h3><button onclick="closeCompanyModal()" class="text-gray-400 hover:text-gray-600">
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+         </svg></button>
+       </div>
+       <form id="company-form" onsubmit="saveCompany(event)" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+         <div><label class="block text-sm font-medium text-gray-700 mb-2">Ragione Sociale</label> <input type="text" id="company-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Azienda SRL">
+         </div>
+         <div><label class="block text-sm font-medium text-gray-700 mb-2">Partita IVA</label> <input type="text" id="company-vat" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="IT12345678901">
+         </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+         <div><label class="block text-sm font-medium text-gray-700 mb-2">Settore</label> <select id="company-sector" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">Seleziona settore</option> <option value="energia">Energia</option> <option value="trasporti">Trasporti</option> <option value="sanita">Sanità</option> <option value="finanza">Finanza e Bancario</option> <option value="ict">ICT e Digitale</option> <option value="pa">Pubblica Amministrazione</option> <option value="manifattura">Manifatturiero</option> <option value="altro">Altro</option> </select>
+         </div>
+         <div><label class="block text-sm font-medium text-gray-700 mb-2">Categoria NIS2</label> <select id="company-category" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"> <option value="">Seleziona categoria</option> <option value="essenziale">Soggetto Essenziale</option> <option value="importante">Soggetto Importante</option> </select>
+         </div>
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Indirizzo</label> <input type="text" id="company-address" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Via Roma 1">
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+         <div><label class="block text-sm font-medium text-gray-700 mb-2">Città</label> <input type="text" id="company-city" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Milano">
+         </div>
+         <div><label class="block text-sm font-medium text-gray-700 mb-2">CAP</label> <input type="text" id="company-zip" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="20100">
+         </div>
+         <div><label class="block text-sm font-medium text-gray-700 mb-2">Provincia</label> <input type="text" id="company-province" required maxlength="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="MI">
+         </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+         <div><label class="block text-sm font-medium text-gray-700 mb-2">Email</label> <input type="email" id="company-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="info@azienda.it">
+         </div>
+         <div><label class="block text-sm font-medium text-gray-700 mb-2">Telefono</label> <input type="tel" id="company-phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="+39 02 1234567">
+         </div>
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Referente Aziendale</label> <input type="text" id="company-contact" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nome Cognome">
+        </div>
+        <div class="flex space-x-3 pt-4"><button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"> Salva Azienda </button> <button type="button" onclick="closeCompanyModal()" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"> Annulla </button>
+        </div>
+       </form>
+      </div>
+     </div>
      <section id="incidents-section" class="section-content hidden">
       <h2 class="text-3xl font-bold text-gray-800 mb-6">Gestione Incidenti</h2>
       <p class="text-gray-600">Sezione incidenti - Dati filtrati in base al ruolo utente</p>
@@ -367,6 +436,10 @@
         btn.classList.remove('bg-blue-50', 'text-blue-600', 'font-medium');
       });
       event.target.closest('button').classList.add('bg-blue-50', 'text-blue-600', 'font-medium');
+      
+      // Load section data
+      if (sectionName === 'users') loadUsers();
+      if (sectionName === 'companies') loadCompanies();
     }
 
     // API Settings Functions
@@ -499,8 +572,285 @@
       document.getElementById('compliance-score').textContent = avgScore + '%';
     }
 
-    // Placeholder functions
-    function showAddUserModal() { alert('Modal gestione utenti - da implementare'); }
+    // ===== USER MANAGEMENT =====
+    
+    function showAddUserModal() {
+      document.getElementById('user-modal').classList.remove('hidden');
+      document.getElementById('user-form').reset();
+      loadCompaniesForSelect();
+    }
+    
+    function closeUserModal() {
+      document.getElementById('user-modal').classList.add('hidden');
+    }
+    
+    function toggleCompanyField() {
+      const role = document.getElementById('user-role').value;
+      const companyField = document.getElementById('company-field');
+      
+      if (role === 'azienda') {
+        companyField.classList.remove('hidden');
+        document.getElementById('user-company').required = true;
+      } else {
+        companyField.classList.add('hidden');
+        document.getElementById('user-company').required = false;
+      }
+    }
+    
+    async function saveUser(event) {
+      event.preventDefault();
+      
+      const userData = {
+        id: Date.now().toString(),
+        name: document.getElementById('user-name').value,
+        email: document.getElementById('user-email').value,
+        password: document.getElementById('user-password').value,
+        role: document.getElementById('user-role').value,
+        company: document.getElementById('user-company').value || null,
+        created_at: new Date().toISOString()
+      };
+      
+      if (supabase) {
+        // Save to Supabase
+        const { error } = await supabase.from('csirt_users').insert([userData]);
+        if (error) {
+          alert('Errore nel salvataggio: ' + error.message);
+          return;
+        }
+      } else {
+        // Save to localStorage
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        users.push(userData);
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+      
+      closeUserModal();
+      loadUsers();
+      alert('Utente creato con successo!');
+    }
+    
+    async function loadUsers() {
+      let users = [];
+      
+      if (supabase) {
+        const { data } = await supabase.from('csirt_users').select('*').order('created_at', { ascending: false });
+        users = data || [];
+      } else {
+        users = JSON.parse(localStorage.getItem('users') || '[]');
+      }
+      
+      const tbody = document.getElementById('users-table-body');
+      tbody.innerHTML = '';
+      
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">Nessun utente trovato</td></tr>';
+        return;
+      }
+      
+      users.forEach(user => {
+        const roleLabels = {
+          'admin': '👤 Admin',
+          'csirt': '🛡️ CSIRT',
+          'azienda': '🏢 Azienda'
+        };
+        
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50';
+        tr.innerHTML = `
+          <td class="px-6 py-4 text-sm font-medium text-gray-900">${user.name}</td>
+          <td class="px-6 py-4 text-sm text-gray-600">${user.email}</td>
+          <td class="px-6 py-4 text-sm">${roleLabels[user.role]}</td>
+          <td class="px-6 py-4 text-sm text-gray-600">${user.company || '-'}</td>
+          <td class="px-6 py-4 text-sm">
+            <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-800 font-medium">
+              Elimina
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    
+    async function deleteUser(userId) {
+      if (!confirm('Sei sicuro di voler eliminare questo utente?')) return;
+      
+      if (supabase) {
+        const { error } = await supabase.from('csirt_users').delete().eq('id', userId);
+        if (error) {
+          alert('Errore: ' + error.message);
+          return;
+        }
+      } else {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const filtered = users.filter(u => u.id !== userId);
+        localStorage.setItem('users', JSON.stringify(filtered));
+      }
+      
+      loadUsers();
+    }
+    
+    // ===== COMPANY MANAGEMENT =====
+    
+    function showAddCompanyModal() {
+      document.getElementById('company-modal').classList.remove('hidden');
+      document.getElementById('company-form').reset();
+    }
+    
+    function closeCompanyModal() {
+      document.getElementById('company-modal').classList.add('hidden');
+    }
+    
+    async function saveCompany(event) {
+      event.preventDefault();
+      
+      const companyData = {
+        id: Date.now().toString(),
+        company_name: document.getElementById('company-name').value,
+        vat_number: document.getElementById('company-vat').value,
+        sector: document.getElementById('company-sector').value,
+        nis2_category: document.getElementById('company-category').value,
+        address: document.getElementById('company-address').value,
+        city: document.getElementById('company-city').value,
+        zip_code: document.getElementById('company-zip').value,
+        province: document.getElementById('company-province').value,
+        email: document.getElementById('company-email').value,
+        phone: document.getElementById('company-phone').value,
+        contact_person: document.getElementById('company-contact').value,
+        created_at: new Date().toISOString()
+      };
+      
+      if (supabase) {
+        const { error } = await supabase.from('csirt_companies').insert([companyData]);
+        if (error) {
+          alert('Errore nel salvataggio: ' + error.message);
+          return;
+        }
+      } else {
+        const companies = JSON.parse(localStorage.getItem('companies') || '[]');
+        companies.push(companyData);
+        localStorage.setItem('companies', JSON.stringify(companies));
+      }
+      
+      closeCompanyModal();
+      loadCompanies();
+      loadDashboard();
+      alert('Azienda creata con successo!');
+    }
+    
+    async function loadCompanies() {
+      let companies = [];
+      
+      if (supabase) {
+        let query = supabase.from('csirt_companies').select('*');
+        
+        if (currentUser.role === 'azienda') {
+          query = query.eq('company_name', currentUser.company);
+        }
+        
+        const { data } = await query.order('created_at', { ascending: false });
+        companies = data || [];
+      } else {
+        companies = JSON.parse(localStorage.getItem('companies') || '[]');
+        if (currentUser.role === 'azienda') {
+          companies = companies.filter(c => c.company_name === currentUser.company);
+        }
+      }
+      
+      const container = document.getElementById('companies-list');
+      container.innerHTML = '';
+      
+      if (companies.length === 0) {
+        container.innerHTML = '<div class="col-span-3 text-center py-12 text-gray-500">Nessuna azienda trovata</div>';
+        return;
+      }
+      
+      companies.forEach(company => {
+        const categoryBadge = company.nis2_category === 'essenziale' 
+          ? '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Essenziale</span>'
+          : '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Importante</span>';
+        
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow';
+        card.innerHTML = `
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center space-x-3">
+              <div class="p-2 bg-blue-100 rounded-lg">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-bold text-lg text-gray-800">${company.company_name}</h3>
+                <p class="text-sm text-gray-500">${company.vat_number}</p>
+              </div>
+            </div>
+            ${categoryBadge}
+          </div>
+          
+          <div class="space-y-2 text-sm mb-4">
+            <p class="text-gray-600"><strong>Settore:</strong> ${company.sector}</p>
+            <p class="text-gray-600"><strong>Città:</strong> ${company.city} (${company.province})</p>
+            <p class="text-gray-600"><strong>Referente:</strong> ${company.contact_person}</p>
+            <p class="text-gray-600"><strong>Email:</strong> ${company.email}</p>
+            <p class="text-gray-600"><strong>Telefono:</strong> ${company.phone}</p>
+          </div>
+          
+          <div class="flex space-x-2 pt-4 border-t border-gray-200">
+            <button onclick="viewCompanyDetails('${company.id}')" class="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors text-sm font-medium">
+              Dettagli
+            </button>
+            <button onclick="deleteCompany('${company.id}')" class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium">
+              Elimina
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    async function deleteCompany(companyId) {
+      if (!confirm('Sei sicuro di voler eliminare questa azienda?')) return;
+      
+      if (supabase) {
+        const { error } = await supabase.from('csirt_companies').delete().eq('id', companyId);
+        if (error) {
+          alert('Errore: ' + error.message);
+          return;
+        }
+      } else {
+        const companies = JSON.parse(localStorage.getItem('companies') || '[]');
+        const filtered = companies.filter(c => c.id !== companyId);
+        localStorage.setItem('companies', JSON.stringify(filtered));
+      }
+      
+      loadCompanies();
+      loadDashboard();
+    }
+    
+    function viewCompanyDetails(companyId) {
+      alert('Visualizzazione dettagli azienda - Da implementare');
+    }
+    
+    async function loadCompaniesForSelect() {
+      let companies = [];
+      
+      if (supabase) {
+        const { data } = await supabase.from('csirt_companies').select('id, company_name').order('company_name');
+        companies = data || [];
+      } else {
+        companies = JSON.parse(localStorage.getItem('companies') || '[]');
+      }
+      
+      const select = document.getElementById('user-company');
+      select.innerHTML = '<option value="">Seleziona azienda</option>';
+      
+      companies.forEach(company => {
+        const option = document.createElement('option');
+        option.value = company.company_name;
+        option.textContent = company.company_name;
+        select.appendChild(option);
+      });
+    }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a93bd8036e80e73',t:'MTc2NDkzOTc3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a93dbc27579ed2b',t:'MTc2NDk0MTAxMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
