@@ -252,24 +252,31 @@
          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
           <div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-gray-700">Script SQL Database</span> <button onclick="copySQLScript()" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"> 📋 Copia Script </button>
           </div>
-          <pre id="sql-script" class="bg-gray-900 text-green-400 p-4 rounded text-xs overflow-x-auto" style="max-height: 400px; font-family: 'Courier New', monospace;">-- 🗄️ SETUP DATABASE PIATTAFORMA CSIRT
+          <pre id="sql-script" class="bg-gray-900 text-green-400 p-4 rounded text-xs overflow-x-auto" style="max-height: 400px; font-family: 'Courier New', monospace;">-- 🗄️ SETUP DATABASE PIATTAFORMA CSIRT - VERSIONE SEMPLIFICATA
 -- Esegui questo script nell'editor SQL di Supabase (SQL Editor)
 
--- 1️⃣ Tabella Aziende
-CREATE TABLE IF NOT EXISTS csirt_companies (
+-- ⚠️ PRIMA: Elimina tabelle esistenti se ci sono errori
+DROP TABLE IF EXISTS csirt_audits CASCADE;
+DROP TABLE IF EXISTS csirt_notifications CASCADE;
+DROP TABLE IF EXISTS csirt_incidents CASCADE;
+DROP TABLE IF EXISTS csirt_users CASCADE;
+DROP TABLE IF EXISTS csirt_companies CASCADE;
+
+-- 1️⃣ Tabella Aziende (struttura semplificata)
+CREATE TABLE csirt_companies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  company_name TEXT NOT NULL,
-  vat_number TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  vat TEXT UNIQUE NOT NULL,
   sector TEXT NOT NULL,
-  nis2_category TEXT NOT NULL,
-  full_address TEXT,
-  company_email TEXT NOT NULL,
-  company_phone TEXT NOT NULL,
+  category TEXT NOT NULL,
+  address TEXT,
+  email TEXT NOT NULL,
+  phone TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- 2️⃣ Tabella Utenti
-CREATE TABLE IF NOT EXISTS csirt_users (
+CREATE TABLE csirt_users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
@@ -280,36 +287,36 @@ CREATE TABLE IF NOT EXISTS csirt_users (
 );
 
 -- 3️⃣ Tabella Incidenti
-CREATE TABLE IF NOT EXISTS csirt_incidents (
+CREATE TABLE csirt_incidents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID REFERENCES csirt_companies(id) ON DELETE CASCADE,
-  incident_title TEXT NOT NULL,
-  incident_description TEXT NOT NULL,
-  incident_severity TEXT NOT NULL,
-  incident_status TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  status TEXT NOT NULL,
   incident_date TIMESTAMP WITH TIME ZONE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- 4️⃣ Tabella Notifiche ACN
-CREATE TABLE IF NOT EXISTS csirt_notifications (
+CREATE TABLE csirt_notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   incident_id UUID REFERENCES csirt_incidents(id) ON DELETE CASCADE,
-  notification_type TEXT NOT NULL,
-  notification_status TEXT NOT NULL,
+  type TEXT NOT NULL,
+  status TEXT NOT NULL,
   notification_date TIMESTAMP WITH TIME ZONE NOT NULL,
-  recipient_email TEXT NOT NULL,
+  recipient TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- 5️⃣ Tabella Audit e Compliance
-CREATE TABLE IF NOT EXISTS csirt_audits (
+CREATE TABLE csirt_audits (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID REFERENCES csirt_companies(id) ON DELETE CASCADE,
-  audit_title TEXT NOT NULL,
+  title TEXT NOT NULL,
   audit_date TIMESTAMP WITH TIME ZONE NOT NULL,
-  audit_score INTEGER NOT NULL,
-  audit_notes TEXT,
+  score INTEGER NOT NULL,
+  notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -614,8 +621,8 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
         
         // Filter by role
         if (currentUser.role === 'azienda') {
-          companiesQuery = companiesQuery.eq('company_name', currentUser.company);
-          incidentsQuery = incidentsQuery.eq('company_name', currentUser.company);
+          companiesQuery = companiesQuery.eq('name', currentUser.company);
+          incidentsQuery = incidentsQuery.eq('name', currentUser.company);
         }
         
         const [companiesRes, incidentsRes, notificationsRes, auditsRes] = await Promise.all([
@@ -647,11 +654,11 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
 
     function updateDashboardStats(companies, incidents, notifications, audits) {
       document.getElementById('total-companies').textContent = companies.length;
-      document.getElementById('open-incidents').textContent = incidents.filter(i => i.incident_status === 'aperto').length;
-      document.getElementById('pending-notifications').textContent = notifications.filter(n => n.notification_status === 'aperta').length;
+      document.getElementById('open-incidents').textContent = incidents.filter(i => i.status === 'aperto').length;
+      document.getElementById('pending-notifications').textContent = notifications.filter(n => n.status === 'aperta').length;
       
       const avgScore = audits.length > 0 
-        ? Math.round(audits.reduce((sum, a) => sum + a.audit_score, 0) / audits.length) 
+        ? Math.round(audits.reduce((sum, a) => sum + a.score, 0) / audits.length) 
         : 0;
       document.getElementById('compliance-score').textContent = avgScore + '%';
     }
@@ -810,13 +817,13 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
       event.preventDefault();
       
       const companyData = {
-        company_name: document.getElementById('company-name').value,
-        vat_number: document.getElementById('company-vat').value,
+        name: document.getElementById('company-name').value,
+        vat: document.getElementById('company-vat').value,
         sector: document.getElementById('company-sector').value,
-        nis2_category: document.getElementById('company-category').value,
-        full_address: document.getElementById('company-address').value,
-        company_email: document.getElementById('company-email').value,
-        company_phone: document.getElementById('company-phone').value
+        category: document.getElementById('company-category').value,
+        address: document.getElementById('company-address').value,
+        email: document.getElementById('company-email').value,
+        phone: document.getElementById('company-phone').value
       };
       
       if (supabase) {
@@ -849,7 +856,7 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
         let query = supabase.from('csirt_companies').select('*');
         
         if (currentUser.role === 'azienda') {
-          query = query.eq('company_name', currentUser.company);
+          query = query.eq('name', currentUser.company);
         }
         
         const { data } = await query.order('created_at', { ascending: false });
@@ -857,7 +864,7 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
       } else {
         companies = JSON.parse(localStorage.getItem('companies') || '[]');
         if (currentUser.role === 'azienda') {
-          companies = companies.filter(c => c.company_name === currentUser.company);
+          companies = companies.filter(c => c.name === currentUser.company);
         }
       }
       
@@ -870,7 +877,7 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
       }
       
       companies.forEach(company => {
-        const categoryBadge = company.nis2_category === 'essenziale' 
+        const categoryBadge = company.category === 'essenziale' 
           ? '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Essenziale</span>'
           : '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Importante</span>';
         
@@ -885,8 +892,8 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
                 </svg>
               </div>
               <div>
-                <h3 class="font-bold text-lg text-gray-800">${company.company_name}</h3>
-                <p class="text-sm text-gray-500">${company.vat_number}</p>
+                <h3 class="font-bold text-lg text-gray-800">${company.name}</h3>
+                <p class="text-sm text-gray-500">${company.vat}</p>
               </div>
             </div>
             ${categoryBadge}
@@ -894,9 +901,9 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
           
           <div class="space-y-2 text-sm mb-4">
             <p class="text-gray-600"><strong>Settore:</strong> ${company.sector}</p>
-            <p class="text-gray-600"><strong>Indirizzo:</strong> ${company.full_address || '-'}</p>
-            <p class="text-gray-600"><strong>Email:</strong> ${company.company_email}</p>
-            <p class="text-gray-600"><strong>Telefono:</strong> ${company.company_phone}</p>
+            <p class="text-gray-600"><strong>Indirizzo:</strong> ${company.address || '-'}</p>
+            <p class="text-gray-600"><strong>Email:</strong> ${company.email}</p>
+            <p class="text-gray-600"><strong>Telefono:</strong> ${company.phone}</p>
           </div>
           
           <div class="flex space-x-2 pt-4 border-t border-gray-200">
@@ -939,7 +946,7 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
       let companies = [];
       
       if (supabase) {
-        const { data } = await supabase.from('csirt_companies').select('id, company_name').order('company_name');
+        const { data } = await supabase.from('csirt_companies').select('id, name').order('name');
         companies = data || [];
       } else {
         companies = JSON.parse(localStorage.getItem('companies') || '[]');
@@ -951,10 +958,10 @@ CREATE TABLE IF NOT EXISTS csirt_audits (
       companies.forEach(company => {
         const option = document.createElement('option');
         option.value = company.id;
-        option.textContent = company.company_name;
+        option.textContent = company.name;
         select.appendChild(option);
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a94267c531fed92',t:'MTc2NDk0NDA3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a943a445210ed2b',t:'MTc2NDk0NDg4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
