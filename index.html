@@ -591,19 +591,46 @@
     async function saveUser(event) {
       event.preventDefault();
       
+      const companyValue = document.getElementById('user-company').value;
+      
+      // Prepara dati base sempre presenti
       const userData = {
         name: document.getElementById('user-name').value,
         email: document.getElementById('user-email').value,
         password: document.getElementById('user-password').value,
-        role: document.getElementById('user-role').value,
-        company_id: document.getElementById('user-company').value || null
+        role: document.getElementById('user-role').value
       };
       
+      // Aggiungi company_id solo se valorizzato
+      if (companyValue) {
+        userData.company_id = companyValue;
+      }
+      
       if (supabase) {
-        // Save to Supabase
-        const { error } = await supabase.from('csirt_users').insert([userData]);
+        // Prova prima a fare una query di test per vedere quali colonne esistono
+        const { data: testData, error: testError } = await supabase
+          .from('csirt_users')
+          .select('*')
+          .limit(1);
+        
+        // Se la tabella esiste, prova l'insert
+        const { data, error } = await supabase.from('csirt_users').insert([userData]).select();
+        
         if (error) {
-          alert('Errore nel salvataggio: ' + error.message);
+          // Mostra errore dettagliato
+          let errorMsg = 'Errore nel salvataggio: ' + error.message;
+          
+          if (error.message.includes('column') || error.message.includes('schema')) {
+            errorMsg += '\n\n⚠️ SOLUZIONE: Verifica che la tabella "csirt_users" in Supabase abbia queste colonne:\n';
+            errorMsg += '- name (text)\n';
+            errorMsg += '- email (text)\n';
+            errorMsg += '- password (text)\n';
+            errorMsg += '- role (text)\n';
+            errorMsg += '- company_id (uuid o bigint, nullable)\n';
+            errorMsg += '- created_at (timestamp with time zone, default now())';
+          }
+          
+          alert(errorMsg);
           return;
         }
       } else {
@@ -844,5 +871,5 @@
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a94156d0422ed2b',t:'MTc2NDk0MzM3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a941b09a6550e73',t:'MTc2NDk0MzYwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
