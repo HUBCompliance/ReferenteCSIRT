@@ -692,39 +692,49 @@ CREATE TABLE csirt_audits (
     async function saveUser(event) {
       event.preventDefault();
       
-      const companyValue = document.getElementById('user-company').value;
+      // Leggi tutti i valori dal form
+      const fullName = document.getElementById('user-full-name').value.trim();
+      const email = document.getElementById('user-email').value.trim();
+      const password = document.getElementById('user-password').value.trim();
+      const role = document.getElementById('user-role').value.trim();
+      const companyValue = document.getElementById('user-company').value.trim();
       
-      // Prepara dati base sempre presenti - USA FULL_NAME
+      // Validazione campi obbligatori
+      if (!fullName || !email || !password || !role) {
+        alert('⚠️ Compila tutti i campi obbligatori:\n- Nome Completo\n- Email\n- Password\n- Ruolo');
+        return;
+      }
+      
+      // Prepara dati base sempre presenti
       const userData = {
-        full_name: document.getElementById('user-full-name').value,
-        email: document.getElementById('user-email').value,
-        password: document.getElementById('user-password').value,
-        role: document.getElementById('user-role').value
+        full_name: fullName,
+        email: email,
+        password: password,
+        role: role,
+        company_id: companyValue || null
       };
       
-      // Aggiungi company_id solo se valorizzato
-      if (companyValue) {
-        userData.company_id = companyValue;
-      }
+      console.log('Dati utente da salvare:', userData); // Debug
       
       if (supabase) {
         const { data, error } = await supabase.from('csirt_users').insert([userData]).select();
         
         if (error) {
-          let errorMsg = 'Errore nel salvataggio: ' + error.message;
+          console.error('Errore Supabase:', error);
           
-          if (error.message.includes('column') || error.message.includes('schema')) {
-            errorMsg += '\n\n⚠️ SOLUZIONE:\n';
-            errorMsg += '1. Vai su Supabase Dashboard → SQL Editor\n';
-            errorMsg += '2. Vai alla sezione "Impostazioni API" qui sopra\n';
-            errorMsg += '3. Copia e incolla il NUOVO script SQL (versione 2.0)\n';
-            errorMsg += '4. Clicca "Run" in Supabase\n';
-            errorMsg += '5. Riprova a salvare l\'utente';
+          let errorMsg = '❌ Errore nel salvataggio:\n' + error.message;
+          
+          if (error.message.includes('duplicate key') || error.message.includes('unique')) {
+            errorMsg = '⚠️ Questa email è già registrata. Usa un\'altra email.';
+          } else if (error.message.includes('null value') || error.message.includes('not-null')) {
+            errorMsg = '⚠️ Errore: un campo obbligatorio è vuoto.\n\nVerifica che il form sia compilato correttamente.';
           }
           
           alert(errorMsg);
           return;
         }
+        
+        console.log('Utente salvato:', data);
       } else {
         // Save to localStorage
         const users = JSON.parse(localStorage.getItem('users') || '[]');
@@ -739,7 +749,7 @@ CREATE TABLE csirt_audits (
       
       closeUserModal();
       loadUsers();
-      alert('Utente creato con successo!');
+      alert('✅ Utente creato con successo!');
     }
     
     async function loadUsers() {
@@ -966,5 +976,5 @@ CREATE TABLE csirt_audits (
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a944cb5c4ece898',t:'MTc2NDk0NTYzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a9452e992aeed9f',t:'MTc2NDk0NTg5MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
