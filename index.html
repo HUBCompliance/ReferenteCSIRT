@@ -45,7 +45,7 @@
      </div>
      <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="login-password" placeholder="••••••••" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
      </div>
-     <div><label class="block text-sm font-medium text-gray-700 mb-2">Profilo</label> <select id="login-role" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required> <option value="">Seleziona il tuo ruolo</option> <option value="admin">👤 Amministratore</option> <option value="csirt">🛡️ Consulente/Referente CSIRT</option> <option value="azienda">🏢 Referente Aziendale</option> </select>
+     <div><label class="block text-sm font-medium text-gray-700 mb-2">Profilo</label> <select id="login-role" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required> <option value="">Seleziona il tuo ruolo</option> <option value="admin">👤 Amministratore</option> <option value="csirt">🛡����� Consulente/Referente CSIRT</option> <option value="azienda">🏢 Referente Aziendale</option> </select>
      </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"> Accedi alla Piattaforma </button>
     </form>
     <div class="mt-6 pt-6 border-t border-gray-200">
@@ -76,7 +76,7 @@
         <p class="text-xs text-blue-100" id="user-role">Amministratore</p>
        </div>
        <div id="api-status" class="hidden px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-        🟢 API Connessa
+        �� API Connessa
        </div><button onclick="logout()" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex items-center space-x-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -263,7 +263,7 @@ DROP TABLE IF EXISTS csirt_incidents CASCADE;
 DROP TABLE IF EXISTS csirt_users CASCADE;
 DROP TABLE IF EXISTS csirt_companies CASCADE;
 
--- 1️��� Tabella Aziende
+-- 1️����� Tabella Aziende
 CREATE TABLE csirt_companies (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
@@ -693,64 +693,103 @@ CREATE TABLE csirt_audits (
     async function saveUser(event) {
       event.preventDefault();
       
-      // Leggi tutti i valori dal form
-      const fullName = document.getElementById('user-full-name').value.trim();
-      const email = document.getElementById('user-email').value.trim();
-      const phone = document.getElementById('user-phone').value.trim();
-      const role = document.getElementById('user-role').value.trim();
-      const companyValue = document.getElementById('user-company').value.trim();
+      // Mostra feedback visivo immediato
+      const submitBtn = event.target.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Salvataggio...';
       
-      // Validazione campi obbligatori
-      if (!fullName || !email || !phone || !role) {
-        alert('⚠️ Compila tutti i campi obbligatori:\n- Nome Completo\n- Email\n- Telefono\n- Ruolo');
-        return;
-      }
-      
-      // Prepara dati base sempre presenti
-      const userData = {
-        full_name: fullName,
-        email: email,
-        phone: phone,
-        role: role,
-        company_id: companyValue || null
-      };
-      
-      console.log('Dati utente da salvare:', userData); // Debug
-      
-      if (supabase) {
-        const { data, error } = await supabase.from('csirt_users').insert([userData]).select();
+      try {
+        // Leggi tutti i valori dal form - verifica che gli elementi esistano
+        const fullNameEl = document.getElementById('user-full-name');
+        const emailEl = document.getElementById('user-email');
+        const phoneEl = document.getElementById('user-phone');
+        const roleEl = document.getElementById('user-role');
+        const companyEl = document.getElementById('user-company');
         
-        if (error) {
-          console.error('Errore Supabase:', error);
-          
-          let errorMsg = '❌ Errore nel salvataggio:\n' + error.message;
-          
-          if (error.message.includes('duplicate key') || error.message.includes('unique')) {
-            errorMsg = '⚠️ Questa email è già registrata. Usa un\'altra email.';
-          } else if (error.message.includes('null value') || error.message.includes('not-null')) {
-            errorMsg = '⚠️ Errore: un campo obbligatorio è vuoto.\n\nVerifica che il form sia compilato correttamente.';
-          }
-          
-          alert(errorMsg);
+        if (!fullNameEl || !emailEl || !phoneEl || !roleEl || !companyEl) {
+          console.error('Elementi form mancanti:', {
+            fullName: !!fullNameEl,
+            email: !!emailEl,
+            phone: !!phoneEl,
+            role: !!roleEl,
+            company: !!companyEl
+          });
+          alert('❌ Errore: Modulo non completamente caricato. Riprova.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
           return;
         }
         
-        console.log('Utente salvato:', data);
-      } else {
-        // Save to localStorage
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const localData = {
-          id: Date.now().toString(),
-          ...userData,
-          created_at: new Date().toISOString()
+        const fullName = fullNameEl.value.trim();
+        const email = emailEl.value.trim();
+        const phone = phoneEl.value.trim();
+        const role = roleEl.value.trim();
+        const companyValue = companyEl.value.trim();
+        
+        // Validazione campi obbligatori
+        if (!fullName || !email || !phone || !role) {
+          alert('⚠️ Compila tutti i campi obbligatori:\n- Nome Completo\n- Email\n- Telefono\n- Ruolo');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
+          return;
+        }
+        
+        // Prepara dati base sempre presenti
+        const userData = {
+          full_name: fullName,
+          email: email,
+          phone: phone,
+          role: role,
+          company_id: companyValue || null
         };
-        users.push(localData);
-        localStorage.setItem('users', JSON.stringify(users));
+        
+        console.log('Dati utente da salvare:', userData); // Debug
+        
+        if (supabase) {
+          const { data, error } = await supabase.from('csirt_users').insert([userData]).select();
+          
+          if (error) {
+            console.error('Errore Supabase:', error);
+            
+            let errorMsg = '❌ Errore nel salvataggio:\n' + error.message;
+            
+            if (error.message.includes('duplicate key') || error.message.includes('unique')) {
+              errorMsg = '⚠️ Questa email è già registrata. Usa un\'altra email.';
+            } else if (error.message.includes('null value') || error.message.includes('not-null')) {
+              errorMsg = '⚠️ Errore: un campo obbligatorio è vuoto.\n\nVerifica che il form sia compilato correttamente.';
+            }
+            
+            alert(errorMsg);
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+            return;
+          }
+          
+          console.log('Utente salvato:', data);
+        } else {
+          // Save to localStorage
+          const users = JSON.parse(localStorage.getItem('users') || '[]');
+          const localData = {
+            id: Date.now().toString(),
+            ...userData,
+            created_at: new Date().toISOString()
+          };
+          users.push(localData);
+          localStorage.setItem('users', JSON.stringify(users));
+          console.log('Utente salvato in localStorage:', localData);
+        }
+        
+        closeUserModal();
+        await loadUsers();
+        alert('✅ Utente creato con successo!');
+        
+      } catch (error) {
+        console.error('Errore imprevisto:', error);
+        alert('❌ Errore imprevisto: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
       }
-      
-      closeUserModal();
-      loadUsers();
-      alert('✅ Utente creato con successo!');
     }
     
     async function loadUsers() {
@@ -1077,5 +1116,5 @@ CREATE TABLE csirt_audits (
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a94606193835267',t:'MTc2NDk0NjQ0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a946aa9a4f65267',t:'MTc2NDk0Njg2My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
