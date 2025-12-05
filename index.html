@@ -704,19 +704,17 @@
       event.preventDefault();
       
       const companyData = {
-        id: Date.now().toString(),
         company_name: document.getElementById('company-name').value,
         vat_number: document.getElementById('company-vat').value,
         sector: document.getElementById('company-sector').value,
         nis2_category: document.getElementById('company-category').value,
-        address: document.getElementById('company-address').value,
-        city: document.getElementById('company-city').value,
-        zip_code: document.getElementById('company-zip').value,
-        province: document.getElementById('company-province').value,
+        full_address: document.getElementById('company-address').value + ', ' + 
+                      document.getElementById('company-city').value + ' ' + 
+                      document.getElementById('company-zip').value + ' (' + 
+                      document.getElementById('company-province').value + ')',
         email: document.getElementById('company-email').value,
         phone: document.getElementById('company-phone').value,
-        contact_person: document.getElementById('company-contact').value,
-        created_at: new Date().toISOString()
+        contact_person: document.getElementById('company-contact').value
       };
       
       if (supabase) {
@@ -727,7 +725,12 @@
         }
       } else {
         const companies = JSON.parse(localStorage.getItem('companies') || '[]');
-        companies.push(companyData);
+        const localData = {
+          id: Date.now().toString(),
+          ...companyData,
+          created_at: new Date().toISOString()
+        };
+        companies.push(localData);
         localStorage.setItem('companies', JSON.stringify(companies));
       }
       
@@ -789,7 +792,7 @@
           
           <div class="space-y-2 text-sm mb-4">
             <p class="text-gray-600"><strong>Settore:</strong> ${company.sector}</p>
-            <p class="text-gray-600"><strong>Città:</strong> ${company.city} (${company.province})</p>
+            <p class="text-gray-600"><strong>Indirizzo:</strong> ${company.full_address || '-'}</p>
             <p class="text-gray-600"><strong>Referente:</strong> ${company.contact_person}</p>
             <p class="text-gray-600"><strong>Email:</strong> ${company.email}</p>
             <p class="text-gray-600"><strong>Telefono:</strong> ${company.phone}</p>
@@ -852,5 +855,5 @@
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a93dbc27579ed2b',t:'MTc2NDk0MTAxMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a93ff5d37990e49',t:'MTc2NDk0MjQ2OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
