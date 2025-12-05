@@ -1699,16 +1699,19 @@ CREATE TABLE csirt_audits (
           console.log('✅ Configurazione rete salvata in localStorage');
         }
         
-        // Render visualizations
+        // Render visualizations immediately
+        console.log('🎨 Rendering visualizzazioni...');
         renderNetworkDiagram(networkData);
         renderNetworkHierarchy(networkData);
         
-        status.textContent = '✅ Configurazione salvata con successo!';
+        status.textContent = '✅ Configurazione salvata! Visualizzazioni aggiornate.';
         status.className = 'text-sm font-medium text-green-600';
         
+        // Auto-switch to diagram tab to show results
         setTimeout(() => {
+          showNetworkTab('diagram');
           status.textContent = '';
-        }, 3000);
+        }, 2000);
         
       } catch (error) {
         console.error('❌ Errore salvataggio rete:', error);
@@ -1744,12 +1747,34 @@ CREATE TABLE csirt_audits (
       
       // Load data when switching to diagram or hierarchy tabs
       if (tabName === 'diagram' || tabName === 'hierarchy') {
+        console.log('🔄 Caricamento dati per tab:', tabName);
         const networkData = JSON.parse(localStorage.getItem('network_config') || '{}');
+        console.log('📊 Dati caricati:', networkData);
+        
         if (Object.keys(networkData).length > 0) {
           if (tabName === 'diagram') {
+            console.log('🎨 Rendering diagramma...');
             renderNetworkDiagram(networkData);
           } else {
+            console.log('🌳 Rendering gerarchia...');
             renderNetworkHierarchy(networkData);
+          }
+        } else {
+          // Show message if no data
+          const container = tabName === 'diagram' 
+            ? document.getElementById('network-visual-diagram')
+            : document.getElementById('network-hierarchy-view');
+          
+          if (container) {
+            container.innerHTML = `
+              <div class="flex flex-col items-center justify-center py-16 text-center">
+                <svg class="w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <p class="text-xl font-semibold text-gray-600 mb-2">Nessuna configurazione salvata</p>
+                <p class="text-gray-500">Compila e salva la configurazione nel tab "⚙️ Configurazione" per visualizzare ${tabName === 'diagram' ? 'il diagramma' : 'la gerarchia'}</p>
+              </div>
+            `;
           }
         }
       }
@@ -2849,5 +2874,5 @@ CREATE TABLE csirt_audits (
       await loadDashboard();
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a9611df13f9ba99',t:'MTc2NDk2NDE5OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a9647631368ed2b',t:'MTc2NDk2NjM5MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
