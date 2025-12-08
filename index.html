@@ -52,7 +52,7 @@
     <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
      <div><label class="block text-sm font-medium text-gray-700 mb-2">Email</label> <input type="email" id="login-email" placeholder="inserisci@email.com" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
      </div>
-     <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="login-password" placeholder="••••••••" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+     <div><label class="block text-sm font-medium text-gray-700 mb-2">Password</label> <input type="password" id="login-password" placeholder="••••��•••" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
      </div>
      <div><label class="block text-sm font-medium text-gray-700 mb-2">Profilo</label> <select id="login-role" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required> <option value="">Seleziona il tuo ruolo</option> <option value="admin">����� Amministratore</option> <option value="csirt">🛡️ Consulente/Referente CSIRT</option> <option value="azienda">🏢 Referente Aziendale</option> </select>
      </div><button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"> Accedi alla Piattaforma </button>
@@ -99,7 +99,10 @@
        </svg><span>Dashboard</span> </button> <button onclick="showSection('companies')" class="nav-item flex items-center space-x-3 w-full px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors" data-role="admin,csirt">
        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-       </svg><span>Aziende</span> </button> <button onclick="showSection('incidents')" class="nav-item flex items-center space-x-3 w-full px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors">
+       </svg><span>Aziende</span> </button> <button onclick="showSection('users')" class="nav-item flex items-center space-x-3 w-full px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors" data-role="admin">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+       </svg><span>Utenti</span> </button> <button onclick="showSection('incidents')" class="nav-item flex items-center space-x-3 w-full px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors">
        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
        </svg><span>Incidenti</span> </button> <button onclick="showSection('notifications')" class="nav-item flex items-center space-x-3 w-full px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors" data-role="admin,csirt">
@@ -172,59 +175,451 @@
        </div>
       </div><!-- CSIRT Dashboard Cards -->
       <div id="csirt-dashboard-cards" class="hidden">
-       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div onclick="showSection('incidents')" class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl shadow-md p-6 border-l-4 border-red-500 cursor-pointer hover:shadow-xl transition-all transform hover:scale-105">
-         <div class="flex items-center justify-between mb-4">
-          <div class="bg-red-500 p-3 rounded-full">
-           <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-           </svg>
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"><!-- Card 1: Registro Incidenti -->
+        <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow cursor-pointer border-t-4 border-red-500" onclick="openIncidentsDetail()">
+         <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+           <div class="bg-red-100 p-3 rounded-full">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+           </div><span class="text-3xl font-bold text-red-600" id="incident-count">0</span>
           </div>
-          <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-         </div>
-         <h3 class="text-xl font-bold text-gray-800 mb-2">🚨 Registro Incidenti</h3>
-         <p class="text-gray-600 text-sm">Gestisci e registra incidenti di sicurezza conformi NIS2</p>
-         <div class="mt-4 text-sm font-medium text-red-700">
-          Clicca per gestire →
-         </div>
-        </div>
-        <div onclick="showSection('designation-detail')" class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-md p-6 border-l-4 border-purple-500 cursor-pointer hover:shadow-xl transition-all transform hover:scale-105">
-         <div class="flex items-center justify-between mb-4">
-          <div class="bg-purple-500 p-3 rounded-full">
-           <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-           </svg>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">🚨 Registro Incidenti</h3>
+          <p class="text-gray-600 text-sm">Gestisci e traccia gli incidenti di sicurezza secondo NIS2</p>
+          <div class="mt-4 pt-4 border-t border-gray-200"><button class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium"> Apri Registro → </button>
           </div>
-          <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
          </div>
-         <h3 class="text-xl font-bold text-gray-800 mb-2">📋 Designazione Referente CSIRT</h3>
-         <p class="text-gray-600 text-sm">Gestisci i dati del referente CSIRT, sostituti e contatto ACN</p>
-         <div class="mt-4 text-sm font-medium text-purple-700">
-          Clicca per compilare →
-         </div>
-        </div>
-        <div onclick="showSection('network')" class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-6 border-l-4 border-green-500 cursor-pointer hover:shadow-xl transition-all transform hover:scale-105">
-         <div class="flex items-center justify-between mb-4">
-          <div class="bg-green-500 p-3 rounded-full">
-           <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-           </svg>
+        </div><!-- Card 2: Designazione Referente CSIRT -->
+        <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow cursor-pointer border-t-4 border-purple-500" onclick="openDesignationDetail()">
+         <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+           <div class="bg-purple-100 p-3 rounded-full">
+            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+           </div><span class="text-sm font-medium text-purple-600" id="designation-status">Non compilato</span>
           </div>
-          <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">📋 Designazione CSIRT</h3>
+          <p class="text-gray-600 text-sm">Compila i dati del referente CSIRT e sostituti</p>
+          <div class="mt-4 pt-4 border-t border-gray-200"><button class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium"> Apri Designazione → </button>
+          </div>
          </div>
-         <h3 class="text-xl font-bold text-gray-800 mb-2">🌐 Configurazione Rete Aziendale</h3>
-         <p class="text-gray-600 text-sm">Definisci topologia, sicurezza perimetrale e connettività</p>
-         <div class="mt-4 text-sm font-medium text-green-700">
-          Clicca per configurare →
+        </div><!-- Card 3: Configurazione Rete -->
+        <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow cursor-pointer border-t-4 border-blue-500" onclick="openNetworkDetail()">
+         <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+           <div class="bg-blue-100 p-3 rounded-full">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+            </svg>
+           </div><span class="text-sm font-medium text-blue-600" id="network-status">Non configurato</span>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">🌐 Configurazione Rete</h3>
+          <p class="text-gray-600 text-sm">Definisci architettura, sicurezza e monitoraggio rete</p>
+          <div class="mt-4 pt-4 border-t border-gray-200"><button class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"> Apri Configurazione → </button>
+          </div>
          </div>
         </div>
        </div>
+      </div><!-- Incidents Detail Section (Hidden by default) -->
+      <div id="incidents-detail-section" class="hidden">
+       <div class="mb-6 flex items-center space-x-4"><button onclick="closeIncidentsDetail()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center space-x-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+         </svg><span>Torna alla Dashboard</span> </button>
+        <h2 class="text-3xl font-bold text-gray-800">🚨 Registro Incidenti di Sicurezza</h2>
+       </div>
+       <div class="bg-white rounded-xl shadow-md">
+        <div class="flex border-b border-gray-200"><button onclick="switchIncidentSubTab('list')" id="incident-subtab-list" class="incident-subtab px-6 py-4 font-medium text-blue-600 border-b-2 border-blue-600"> 📋 Lista Incidenti </button> <button onclick="switchIncidentSubTab('new')" id="incident-subtab-new" class="incident-subtab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"> ➕ Nuovo Incidente </button> <button onclick="switchIncidentSubTab('drafts')" id="incident-subtab-drafts" class="incident-subtab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"> 💾 Bozze </button>
+        </div><!-- Tab Content: List -->
+        <div id="incident-subcontent-list" class="incident-subtab-content p-6">
+         <div class="flex justify-between items-center mb-6">
+          <div class="flex space-x-4"><input type="text" id="search-incidents" placeholder="🔍 Cerca incidenti..." class="px-4 py-2 border border-gray-300 rounded-lg w-64"> <select id="filter-status" class="px-4 py-2 border border-gray-300 rounded-lg"> <option value="">Tutti gli stati</option> <option value="aperto">Aperto</option> <option value="in-corso">In Corso</option> <option value="risolto">Risolto</option> </select>
+          </div><button onclick="exportIncidents()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center space-x-2">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+           </svg><span>Esporta</span> </button>
+         </div>
+         <div id="incidents-list" class="space-y-4">
+          <p class="text-center text-gray-500 py-8">Nessun incidente registrato</p>
+         </div>
+        </div><!-- Tab Content: New -->
+        <div id="incident-subcontent-new" class="incident-subtab-content hidden p-6">
+         <form id="incident-form" onsubmit="saveIncident(event)"><!-- Include all the incident form sections here -->
+          <div class="mb-8">
+           <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">📋 Dati Generali Incidente</h3>
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Titolo Incidente *</label> <input type="text" id="incident-title" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            </div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Data/Ora Rilevamento *</label> <input type="datetime-local" id="incident-datetime" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            </div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Gravità *</label> <select id="incident-severity" required class="w-full px-4 py-2 border border-gray-300 rounded-lg"> <option value="">Seleziona gravità</option> <option value="critical">🔴 Critica</option> <option value="high">🟠 Alta</option> <option value="medium">🟡 Media</option> <option value="low">🔵 Bassa</option> </select>
+            </div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Stato *</label> <select id="incident-status" required class="w-full px-4 py-2 border border-gray-300 rounded-lg"> <option value="aperto">Aperto</option> <option value="in-corso">In Corso</option> <option value="risolto">Risolto</option> </select>
+            </div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-2">Descrizione Incidente *</label> <textarea id="incident-description" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
+            </div>
+           </div>
+          </div>
+          <div class="mb-8">
+           <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">🏷️ Categorizzazione</h3>
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Tipo Incidente *</label> <select id="incident-type" required class="w-full px-4 py-2 border border-gray-300 rounded-lg"> <option value="">Seleziona tipo</option> <option value="malware">Malware</option> <option value="phishing">Phishing</option> <option value="ddos">DDoS</option> <option value="data-breach">Data Breach</option> <option value="ransomware">Ransomware</option> <option value="accesso-non-autorizzato">Accesso Non Autorizzato</option> <option value="altro">Altro</option> </select>
+            </div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Servizio/Asset Colpito</label> <input type="text" id="incident-asset" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            </div>
+           </div>
+          </div>
+          <div class="mb-8">
+           <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">💥 Impatto dell'Incidente</h3>
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Numero Utenti Coinvolti</label> <input type="number" id="incident-users" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            </div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Durata Interruzione (ore)</label> <input type="number" id="incident-duration" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+            </div>
+            <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-2">Descrizione Impatto</label> <textarea id="incident-impact" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
+            </div>
+            <div class="md:col-span-2"><label class="flex items-center space-x-2"> <input type="checkbox" id="incident-data-loss" class="w-4 h-4 text-blue-600"> <span class="text-sm font-medium text-gray-700">Perdita/Compromissione Dati</span> </label>
+            </div>
+           </div>
+          </div>
+          <div class="mb-8">
+           <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">🛠️ Azioni Intraprese</h3>
+           <div class="space-y-4">
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Misure di Contenimento</label> <textarea id="incident-containment" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Descrivere le azioni immediate per contenere l'incidente"></textarea>
+            </div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Azioni Correttive</label> <textarea id="incident-corrective" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Descrivere le azioni per risolvere l'incidente"></textarea>
+            </div>
+            <div><label class="block text-sm font-medium text-gray-700 mb-2">Raccomandazioni Future</label> <textarea id="incident-recommendations" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Raccomandazioni per prevenire incidenti simili"></textarea>
+            </div>
+           </div>
+          </div>
+          <div class="mb-8">
+           <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-blue-500">📢 Notifica ACN</h3>
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="flex items-center space-x-2 mb-4"> <input type="checkbox" id="incident-acn-required" class="w-4 h-4 text-blue-600" onchange="toggleACNFields()"> <span class="text-sm font-medium text-gray-700">Richiede Notifica ACN</span> </label>
+            </div>
+            <div></div>
+            <div id="acn-fields" class="md:col-span-2 hidden space-y-4">
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label class="block text-sm font-medium text-gray-700 mb-2">Data Notifica Iniziale</label> <input type="datetime-local" id="incident-acn-date-initial" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              <div><label class="block text-sm font-medium text-gray-700 mb-2">Data Notifica Intermedia</label> <input type="datetime-local" id="incident-acn-date-intermediate" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              <div><label class="block text-sm font-medium text-gray-700 mb-2">Data Notifica Finale</label> <input type="datetime-local" id="incident-acn-date-final" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              <div><label class="block text-sm font-medium text-gray-700 mb-2">Numero Protocollo ACN</label> <input type="text" id="incident-acn-protocol" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+             </div>
+             <div><label class="block text-sm font-medium text-gray-700 mb-2">Note Comunicazione ACN</label> <textarea id="incident-acn-notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
+             </div>
+            </div>
+           </div>
+          </div>
+          <div class="flex justify-between items-center pt-6 border-t"><button type="button" onclick="saveDraft()" class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg><span>Salva Bozza</span> </button>
+           <div class="flex space-x-4"><button type="button" onclick="resetIncidentForm()" class="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg"> Annulla </button> <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center space-x-2">
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+             </svg><span>Salva Incidente</span> </button>
+           </div>
+          </div>
+         </form>
+        </div><!-- Incident Sub-tab Content: Drafts -->
+        <div id="incident-subcontent-drafts" class="incident-subtab-content hidden">
+         <div id="drafts-list" class="space-y-4">
+          <p class="text-center text-gray-500 py-8">Nessuna bozza salvata</p>
+         </div>
+        </div>
+       </div><!-- Tab Content: Drafts -->
+       <div id="incident-subcontent-drafts" class="incident-subtab-content hidden p-6">
+        <div id="drafts-list" class="space-y-4">
+         <p class="text-center text-gray-500 py-8">Nessuna bozza salvata</p>
+        </div>
+       </div>
       </div>
-     </section><!-- Companies Section (Placeholder) -->
+     </section>
+    </main>
+   </div><!-- Designation Detail Section (Hidden by default) -->
+   <div id="designation-detail-section" class="hidden">
+    <div class="mb-6 flex items-center space-x-4"><button onclick="closeDesignationDetail()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center space-x-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg><span>Torna alla Dashboard</span> </button>
+     <h2 class="text-3xl font-bold text-gray-800">📋 Designazione Referente CSIRT</h2>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-6">
+     <div class="mb-6">
+      <h3 class="text-2xl font-bold text-gray-800 mb-2">📋 Designazione Referente CSIRT</h3>
+      <p class="text-gray-600">Compila i dati del referente CSIRT, sostituti e informazioni di contatto con ACN</p>
+     </div>
+     <form id="designation-form" onsubmit="saveDesignation(event)">
+      <div class="mb-8">
+       <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-purple-500">🏢 Dati Azienda</h3>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Ragione Sociale *</label> <input type="text" id="des-company-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Partita IVA *</label> <input type="text" id="des-company-vat" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Codice Fiscale</label> <input type="text" id="des-company-cf" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Settore Attività *</label> <select id="des-company-sector" required class="w-full px-4 py-2 border border-gray-300 rounded-lg"> <option value="">Seleziona settore</option> <option value="energia">Energia</option> <option value="trasporti">Trasporti</option> <option value="bancario">Settore Bancario</option> <option value="sanitario">Sanità</option> <option value="ict">ICT</option> <option value="pubblica-amministrazione">Pubblica Amministrazione</option> <option value="altro">Altro</option> </select>
+        </div>
+        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-2">Indirizzo Sede Legale *</label> <input type="text" id="des-company-address" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+       </div>
+      </div>
+      <div class="mb-8">
+       <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-purple-500">👤 Referente CSIRT Principale</h3>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Nome *</label> <input type="text" id="des-main-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Cognome *</label> <input type="text" id="des-main-surname" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Codice Fiscale *</label> <input type="text" id="des-main-cf" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Ruolo in Azienda *</label> <input type="text" id="des-main-role" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Email *</label> <input type="email" id="des-main-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Telefono *</label> <input type="tel" id="des-main-phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">PEC</label> <input type="email" id="des-main-pec" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+       </div>
+      </div>
+      <div class="mb-8">
+       <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-purple-500">👥 Sostituto 1</h3>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Nome</label> <input type="text" id="des-sub1-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Cognome</label> <input type="text" id="des-sub1-surname" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Codice Fiscale</label> <input type="text" id="des-sub1-cf" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Ruolo in Azienda</label> <input type="text" id="des-sub1-role" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Email</label> <input type="email" id="des-sub1-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Telefono</label> <input type="tel" id="des-sub1-phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+       </div>
+      </div>
+      <div class="mb-8">
+       <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-purple-500">👥 Sostituto 2</h3>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Nome</label> <input type="text" id="des-sub2-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Cognome</label> <input type="text" id="des-sub2-surname" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Codice Fiscale</label> <input type="text" id="des-sub2-cf" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Ruolo in Azienda</label> <input type="text" id="des-sub2-role" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Email</label> <input type="email" id="des-sub2-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Telefono</label> <input type="tel" id="des-sub2-phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+       </div>
+      </div>
+      <div class="mb-8">
+       <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-purple-500">📞 Contatto con ACN</h3>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Email Registrata ACN</label> <input type="email" id="des-acn-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">PEC Comunicazioni ACN</label> <input type="email" id="des-acn-pec" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Telefono Emergenze</label> <input type="tel" id="des-acn-phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div><label class="block text-sm font-medium text-gray-700 mb-2">Data Registrazione Portale ACN</label> <input type="date" id="des-acn-registration-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+        </div>
+        <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-700 mb-2">Note Aggiuntive</label> <textarea id="des-notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
+        </div>
+       </div>
+      </div>
+      <div class="flex justify-between items-center pt-6 border-t"><button type="button" onclick="generateDesignationDoc()" class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center space-x-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg><span>Genera Documento Word</span> </button>
+       <div class="flex space-x-4"><button type="button" onclick="resetDesignationForm()" class="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg"> Annulla </button> <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center space-x-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+         </svg><span>Salva Designazione</span> </button>
+       </div>
+      </div>
+     </form>
+    </div><!-- Network Detail Section (Hidden by default) -->
+    <div id="network-detail-section" class="hidden">
+     <div class="mb-6 flex items-center space-x-4"><button onclick="closeNetworkDetail()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg flex items-center space-x-2">
+       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+       </svg><span>Torna alla Dashboard</span> </button>
+      <h2 class="text-3xl font-bold text-gray-800">🌐 Configurazione Rete Aziendale</h2>
+     </div>
+     <div class="bg-white rounded-xl shadow-md">
+      <div class="flex border-b border-gray-200"><button onclick="switchNetworkTab('visualization')" id="network-tab-visualization" class="network-tab px-6 py-4 font-medium text-blue-600 border-b-2 border-blue-600"> 📊 Visualizzazione Rete </button> <button onclick="switchNetworkTab('configuration')" id="network-tab-configuration" class="network-tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"> ⚙️ Configurazione Wizard </button>
+      </div><!-- Tab Content: Visualization -->
+      <div id="network-subcontent-visualization" class="network-tab-content p-6"><!-- Network Diagram Visualization -->
+       <div id="network-visualization" class="mb-8 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 border-2 border-gray-200">
+        <h4 class="text-xl font-bold text-gray-800 mb-6 text-center">📊 Diagramma Architettura Rete</h4><!-- SVG Network Diagram -->
+        <svg id="network-diagram" viewbox="0 0 800 600" class="w-full h-auto"><!-- Internet Cloud --> <g id="internet-cloud">
+          <ellipse cx="400" cy="80" rx="80" ry="50" fill="#3b82f6" opacity="0.2" stroke="#3b82f6" stroke-width="2" />
+          <text x="400" y="85" text-anchor="middle" fill="#1e40af" font-weight="bold" font-size="14">
+           ☁️ INTERNET
+          </text>
+         </g> <!-- Connection Line --> <line x1="400" y1="130" x2="400" y2="180" stroke="#6b7280" stroke-width="2" stroke-dasharray="5,5" /> <!-- Firewall --> <g id="firewall">
+          <rect x="350" y="180" width="100" height="60" rx="8" fill="#ef4444" opacity="0.2" stroke="#ef4444" stroke-width="2" />
+          <text x="400" y="205" text-anchor="middle" fill="#991b1b" font-weight="bold" font-size="12">
+           🛡️ FIREWALL
+          </text>
+          <text x="400" y="225" text-anchor="middle" fill="#991b1b" font-size="10" id="firewall-label">
+           NGF
+          </text>
+         </g> <!-- Connection Lines to Internal Network --> <line x1="400" y1="240" x2="400" y2="280" stroke="#6b7280" stroke-width="2" /> <line x1="400" y1="280" x2="250" y2="350" stroke="#6b7280" stroke-width="2" /> <line x1="400" y1="280" x2="400" y2="350" stroke="#6b7280" stroke-width="2" /> <line x1="400" y1="280" x2="550" y2="350" stroke="#6b7280" stroke-width="2" /> <!-- VLAN 1 - Admin --> <g id="vlan-admin">
+          <rect x="150" y="350" width="200" height="200" rx="12" fill="#8b5cf6" opacity="0.1" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="8,4" />
+          <text x="250" y="375" text-anchor="middle" fill="#6b21a8" font-weight="bold" font-size="12">
+           VLAN 10 - Admin
+          </text>
+          <rect x="180" y="390" width="60" height="50" rx="4" fill="#8b5cf6" opacity="0.3" stroke="#8b5cf6" stroke-width="1" />
+          <text x="210" y="420" text-anchor="middle" font-size="20">
+           💻
+          </text>
+          <rect x="260" y="390" width="60" height="50" rx="4" fill="#8b5cf6" opacity="0.3" stroke="#8b5cf6" stroke-width="1" />
+          <text x="290" y="420" text-anchor="middle" font-size="20">
+           💻
+          </text>
+          <rect x="180" y="460" width="60" height="50" rx="4" fill="#8b5cf6" opacity="0.3" stroke="#8b5cf6" stroke-width="1" />
+          <text x="210" y="490" text-anchor="middle" font-size="20">
+           🖥️
+          </text>
+          <rect x="260" y="460" width="60" height="50" rx="4" fill="#8b5cf6" opacity="0.3" stroke="#8b5cf6" stroke-width="1" />
+          <text x="290" y="490" text-anchor="middle" font-size="20">
+           🖥️
+          </text>
+         </g> <!-- VLAN 2 - Production --> <g id="vlan-production">
+          <rect x="450" y="350" width="200" height="200" rx="12" fill="#10b981" opacity="0.1" stroke="#10b981" stroke-width="2" stroke-dasharray="8,4" />
+          <text x="550" y="375" text-anchor="middle" fill="#047857" font-weight="bold" font-size="12">
+           VLAN 20 - Produzione
+          </text>
+          <rect x="480" y="390" width="60" height="50" rx="4" fill="#10b981" opacity="0.3" stroke="#10b981" stroke-width="1" />
+          <text x="510" y="420" text-anchor="middle" font-size="20">
+           🖥️
+          </text>
+          <rect x="560" y="390" width="60" height="50" rx="4" fill="#10b981" opacity="0.3" stroke="#10b981" stroke-width="1" />
+          <text x="590" y="420" text-anchor="middle" font-size="20">
+           🖥️
+          </text>
+          <rect x="480" y="460" width="60" height="50" rx="4" fill="#10b981" opacity="0.3" stroke="#10b981" stroke-width="1" />
+          <text x="510" y="490" text-anchor="middle" font-size="20">
+           💼
+          </text>
+          <rect x="560" y="460" width="60" height="50" rx="4" fill="#10b981" opacity="0.3" stroke="#10b981" stroke-width="1" />
+          <text x="590" y="490" text-anchor="middle" font-size="20">
+           📊
+          </text>
+         </g> <!-- DMZ --> <g id="vlan-dmz">
+          <rect x="300" y="350" width="200" height="120" rx="12" fill="#f59e0b" opacity="0.1" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,4" />
+          <text x="400" y="375" text-anchor="middle" fill="#b45309" font-weight="bold" font-size="12">
+           DMZ - Zona Pubblica
+          </text>
+          <rect x="330" y="390" width="60" height="60" rx="4" fill="#f59e0b" opacity="0.3" stroke="#f59e0b" stroke-width="1" />
+          <text x="360" y="425" text-anchor="middle" font-size="24">
+           🌐
+          </text>
+          <text x="360" y="445" text-anchor="middle" font-size="8">
+           Web Server
+          </text>
+          <rect x="410" y="390" width="60" height="60" rx="4" fill="#f59e0b" opacity="0.3" stroke="#f59e0b" stroke-width="1" />
+          <text x="440" y="425" text-anchor="middle" font-size="24">
+           📧
+          </text>
+          <text x="440" y="445" text-anchor="middle" font-size="8">
+           Mail Server
+          </text>
+         </g>
+        </svg><!-- Network Stats -->
+        <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+         <div class="bg-white rounded-lg p-4 text-center shadow">
+          <div class="text-2xl font-bold text-blue-600" id="stat-sites">
+           -
+          </div>
+          <div class="text-xs text-gray-600">
+           Sedi
+          </div>
+         </div>
+         <div class="bg-white rounded-lg p-4 text-center shadow">
+          <div class="text-2xl font-bold text-green-600" id="stat-users">
+           -
+          </div>
+          <div class="text-xs text-gray-600">
+           Utenti
+          </div>
+         </div>
+         <div class="bg-white rounded-lg p-4 text-center shadow">
+          <div class="text-2xl font-bold text-purple-600" id="stat-vlans">
+           -
+          </div>
+          <div class="text-xs text-gray-600">
+           VLAN
+          </div>
+         </div>
+         <div class="bg-white rounded-lg p-4 text-center shadow">
+          <div class="text-2xl font-bold text-orange-600" id="stat-security">
+           -
+          </div>
+          <div class="text-xs text-gray-600">
+           Livello Sicurezza
+          </div>
+         </div>
+        </div>
+       </div><!-- Tab Content: Configuration -->
+       <div id="network-subcontent-configuration" class="network-tab-content hidden p-6">
+        <p class="text-gray-600 mb-6">Utilizza il wizard per configurare l'architettura di rete aziendale in 5 step</p><button onclick="showSection('network')" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center space-x-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+         </svg><span>Apri Configurazione Wizard</span> </button>
+       </div>
+      </div>
+     </div> <!-- Companies Section -->
      <section id="companies-section" class="section-content hidden">
-      <h2 class="text-3xl font-bold text-gray-800 mb-6">Aziende</h2>
-      <div class="bg-white rounded-xl shadow-md p-6">
-       <p class="text-gray-600">Sezione aziende in costruzione...</p>
+      <h2 class="text-3xl font-bold text-gray-800 mb-2">🏢 Gestione Aziende</h2>
+      <p class="text-gray-600 mb-6">Gestisci le aziende registrate sulla piattaforma e monitora il loro stato di compliance</p>
+      <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+       <div class="flex justify-between items-center mb-6">
+        <div class="flex space-x-4"><input type="text" id="search-companies" placeholder="🔍 Cerca aziende..." class="px-4 py-2 border border-gray-300 rounded-lg w-64" oninput="filterCompanies()"> <select id="filter-company-status" class="px-4 py-2 border border-gray-300 rounded-lg" onchange="filterCompanies()"> <option value="">Tutti gli stati</option> <option value="attivo">Attivo</option> <option value="sospeso">Sospeso</option> <option value="in-valutazione">In Valutazione</option> </select>
+        </div><button onclick="openAddCompanyModal()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center space-x-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+         </svg><span>Nuova Azienda</span> </button>
+       </div>
+       <div id="companies-list" class="space-y-4"><!-- Companies will be rendered here -->
+       </div>
+      </div>
+     </section><!-- Users Section -->
+     <section id="users-section" class="section-content hidden">
+      <h2 class="text-3xl font-bold text-gray-800 mb-2">👥 Gestione Utenti</h2>
+      <p class="text-gray-600 mb-6">Gestisci gli utenti della piattaforma e i loro permessi</p>
+      <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+       <div class="flex justify-between items-center mb-6">
+        <div class="flex space-x-4"><input type="text" id="search-users" placeholder="�� Cerca utenti..." class="px-4 py-2 border border-gray-300 rounded-lg w-64" oninput="filterUsers()"> <select id="filter-user-role" class="px-4 py-2 border border-gray-300 rounded-lg" onchange="filterUsers()"> <option value="">Tutti i ruoli</option> <option value="admin">Amministratore</option> <option value="csirt">Consulente CSIRT</option> <option value="azienda">Referente Aziendale</option> </select> <select id="filter-user-status" class="px-4 py-2 border border-gray-300 rounded-lg" onchange="filterUsers()"> <option value="">Tutti gli stati</option> <option value="attivo">Attivo</option> <option value="sospeso">Sospeso</option> </select>
+        </div><button onclick="openAddUserModal()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center space-x-2">
+         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+         </svg><span>Nuovo Utente</span> </button>
+       </div>
+       <div class="overflow-x-auto">
+        <table class="w-full">
+         <thead class="bg-gray-50 border-b-2 border-gray-200">
+          <tr>
+           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Utente</th>
+           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruolo</th>
+           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Azienda</th>
+           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stato</th>
+           <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ultimo Accesso</th>
+           <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Azioni</th>
+          </tr>
+         </thead>
+         <tbody id="users-table-body" class="bg-white divide-y divide-gray-200"><!-- Users will be rendered here -->
+         </tbody>
+        </table>
+       </div>
       </div>
      </section><!-- Notifications Section (Placeholder) -->
      <section id="notifications-section" class="section-content hidden">
@@ -237,12 +632,12 @@
       <h2 class="text-3xl font-bold text-gray-800 mb-2">🚨 Registro Incidenti di Sicurezza</h2>
       <p class="text-gray-600 mb-6">Documenta e traccia tutti gli incidenti secondo i requisiti NIS2</p><!-- Tabs Navigation -->
       <div class="bg-white rounded-t-xl shadow-md">
-       <div class="flex border-b border-gray-200"><button onclick="switchIncidentTab('list')" id="tab-list" class="incident-tab px-6 py-4 font-medium text-blue-600 border-b-2 border-blue-600"> 📋 Lista Incidenti </button> <button onclick="switchIncidentTab('new')" id="tab-new" class="incident-tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"> ➕ Nuovo Incidente </button> <button onclick="switchIncidentTab('drafts')" id="tab-drafts" class="incident-tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"> 💾 Bozze </button>
+       <div class="flex border-b border-gray-200"><button onclick="switchIncidentTab('list')" id="tab-list" class="incident-tab px-6 py-4 font-medium text-blue-600 border-b-2 border-blue-600"> 📋 Lista Incidenti </button> <button onclick="switchIncidentTab('new')" id="tab-new" class="incident-tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"> ��� Nuovo Incidente </button> <button onclick="switchIncidentTab('drafts')" id="tab-drafts" class="incident-tab px-6 py-4 font-medium text-gray-500 hover:text-gray-700"> 💾 Bozze </button>
        </div>
       </div><!-- Tab Content: List -->
       <div id="incident-tab-list" class="incident-tab-content bg-white rounded-b-xl shadow-md p-6">
        <div class="flex justify-between items-center mb-6">
-        <div class="flex space-x-4"><input type="text" id="search-incidents" placeholder="🔍 Cerca incidenti..." class="px-4 py-2 border border-gray-300 rounded-lg w-64"> <select id="filter-status" class="px-4 py-2 border border-gray-300 rounded-lg"> <option value="">Tutti gli stati</option> <option value="aperto">Aperto</option> <option value="in-corso">In Corso</option> <option value="risolto">Risolto</option> </select>
+        <div class="flex space-x-4"><input type="text" id="search-incidents" placeholder="���� Cerca incidenti..." class="px-4 py-2 border border-gray-300 rounded-lg w-64"> <select id="filter-status" class="px-4 py-2 border border-gray-300 rounded-lg"> <option value="">Tutti gli stati</option> <option value="aperto">Aperto</option> <option value="in-corso">In Corso</option> <option value="risolto">Risolto</option> </select>
         </div><button onclick="exportIncidents()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center space-x-2">
          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -261,7 +656,7 @@
           </div>
           <div><label class="block text-sm font-medium text-gray-700 mb-2">Data/Ora Rilevamento *</label> <input type="datetime-local" id="incident-datetime" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
           </div>
-          <div><label class="block text-sm font-medium text-gray-700 mb-2">Gravità *</label> <select id="incident-severity" required class="w-full px-4 py-2 border border-gray-300 rounded-lg"> <option value="">Seleziona gravità</option> <option value="critical">🔴 Critica</option> <option value="high">🟠 Alta</option> <option value="medium">🟡 Media</option> <option value="low">🔵 Bassa</option> </select>
+          <div><label class="block text-sm font-medium text-gray-700 mb-2">Gravità *</label> <select id="incident-severity" required class="w-full px-4 py-2 border border-gray-300 rounded-lg"> <option value="">Seleziona gravità</option> <option value="critical">🔴 Critica</option> <option value="high">🟠 Alta</option> <option value="medium">🟡 Media</option> <option value="low">��� Bassa</option> </select>
           </div>
           <div><label class="block text-sm font-medium text-gray-700 mb-2">Stato *</label> <select id="incident-status" required class="w-full px-4 py-2 border border-gray-300 rounded-lg"> <option value="aperto">Aperto</option> <option value="in-corso">In Corso</option> <option value="risolto">Risolto</option> </select>
           </div>
@@ -416,7 +811,7 @@
          </div>
         </div><!-- Section 5: Contatto ACN -->
         <div class="mb-8">
-         <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-purple-500">📧 Contatto con ACN</h3>
+         <h3 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-purple-500">�� Contatto con ACN</h3>
          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div><label class="block text-sm font-medium text-gray-700 mb-2">Email Registrata ACN</label> <input type="email" id="des-acn-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
           </div>
@@ -587,10 +982,9 @@
        </form>
       </div>
      </section>
-    </main>
+    </div>
    </div>
-  </div>
-  <script>
+   <script>
     // === GLOBAL STATE ===
     let currentUser = null;
 
@@ -681,6 +1075,15 @@
       
       if (currentUser.role === 'csirt') {
         document.getElementById('csirt-dashboard-cards').classList.remove('hidden');
+        updateIncidentCount();
+        updateDesignationStatus();
+        updateNetworkStatus();
+      }
+      
+      // Load admin sections if admin
+      if (currentUser.role === 'admin') {
+        renderCompaniesList();
+        renderUsersTable();
       }
     }
     
@@ -722,6 +1125,15 @@
       if (event && event.target) {
         event.target.closest('.nav-item').classList.add('bg-blue-50', 'text-blue-600', 'font-medium');
       }
+      
+      // Load section-specific data
+      if (sectionName === 'companies') {
+        renderCompaniesList();
+      } else if (sectionName === 'users') {
+        renderUsersTable();
+      } else if (sectionName === 'incidents') {
+        renderIncidentsList();
+      }
     }
     
     function loadDashboardData() {
@@ -748,23 +1160,85 @@
       setTimeout(() => toast.remove(), 3000);
     }
     
-    // === INCIDENTS MANAGEMENT ===
-    let incidents = JSON.parse(localStorage.getItem('incidents') || '[]');
-    let drafts = JSON.parse(localStorage.getItem('incident_drafts') || '[]');
+    // === CSIRT DASHBOARD CARDS MANAGEMENT ===
+    function openIncidentsDetail() {
+      document.getElementById('csirt-dashboard-cards').classList.add('hidden');
+      document.getElementById('incidents-detail-section').classList.remove('hidden');
+      renderIncidentsList();
+      updateIncidentCount();
+    }
     
-    function switchIncidentTab(tabName) {
-      document.querySelectorAll('.incident-tab').forEach(tab => {
+    function closeIncidentsDetail() {
+      document.getElementById('incidents-detail-section').classList.add('hidden');
+      document.getElementById('csirt-dashboard-cards').classList.remove('hidden');
+    }
+    
+    function openDesignationDetail() {
+      document.getElementById('csirt-dashboard-cards').classList.add('hidden');
+      document.getElementById('designation-detail-section').classList.remove('hidden');
+      updateDesignationStatus();
+    }
+    
+    function closeDesignationDetail() {
+      document.getElementById('designation-detail-section').classList.add('hidden');
+      document.getElementById('csirt-dashboard-cards').classList.remove('hidden');
+    }
+    
+    function openNetworkDetail() {
+      document.getElementById('csirt-dashboard-cards').classList.add('hidden');
+      document.getElementById('network-detail-section').classList.remove('hidden');
+      loadNetworkVisualization();
+      updateNetworkStatus();
+    }
+    
+    function closeNetworkDetail() {
+      document.getElementById('network-detail-section').classList.add('hidden');
+      document.getElementById('csirt-dashboard-cards').classList.remove('hidden');
+    }
+    
+    function updateIncidentCount() {
+      const count = incidents.length;
+      document.getElementById('incident-count').textContent = count;
+    }
+    
+    function updateDesignationStatus() {
+      const statusElement = document.getElementById('designation-status');
+      if (designationData) {
+        statusElement.textContent = '✅ Compilato';
+        statusElement.classList.remove('text-purple-600');
+        statusElement.classList.add('text-green-600');
+      } else {
+        statusElement.textContent = 'Non compilato';
+        statusElement.classList.remove('text-green-600');
+        statusElement.classList.add('text-purple-600');
+      }
+    }
+    
+    function updateNetworkStatus() {
+      const statusElement = document.getElementById('network-status');
+      if (networkConfig) {
+        statusElement.textContent = '✅ Configurato';
+        statusElement.classList.remove('text-blue-600');
+        statusElement.classList.add('text-green-600');
+      } else {
+        statusElement.textContent = 'Non configurato';
+        statusElement.classList.remove('text-green-600');
+        statusElement.classList.add('text-blue-600');
+      }
+    }
+    function switchIncidentSubTab(tabName) {
+      document.querySelectorAll('.incident-subtab').forEach(tab => {
         tab.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
         tab.classList.add('text-gray-500');
       });
       
-      document.querySelectorAll('.incident-tab-content').forEach(content => {
+      document.querySelectorAll('.incident-subtab-content').forEach(content => {
         content.classList.add('hidden');
       });
       
-      document.getElementById('tab-' + tabName).classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
-      document.getElementById('tab-' + tabName).classList.remove('text-gray-500');
-      document.getElementById('incident-tab-' + tabName).classList.remove('hidden');
+      document.getElementById('incident-subtab-' + tabName).classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+      document.getElementById('incident-subtab-' + tabName).classList.remove('text-gray-500');
+      document.getElementById('incident-subcontent-' + tabName).classList.remove('hidden');
       
       if (tabName === 'list') {
         renderIncidentsList();
@@ -773,6 +1247,29 @@
       }
     }
     
+    function switchNetworkTab(tabName) {
+      document.querySelectorAll('.network-tab').forEach(tab => {
+        tab.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+        tab.classList.add('text-gray-500');
+      });
+      
+      document.querySelectorAll('.network-tab-content').forEach(content => {
+        content.classList.add('hidden');
+      });
+      
+      document.getElementById('network-tab-' + tabName).classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+      document.getElementById('network-tab-' + tabName).classList.remove('text-gray-500');
+      document.getElementById('network-subcontent-' + tabName).classList.remove('hidden');
+      
+      if (tabName === 'visualization') {
+        loadNetworkVisualization();
+      }
+    }
+    
+    // === INCIDENTS MANAGEMENT ===
+    let incidents = JSON.parse(localStorage.getItem('incidents') || '[]');
+    let drafts = JSON.parse(localStorage.getItem('incident_drafts') || '[]');
+    
     function toggleACNFields() {
       const checkbox = document.getElementById('incident-acn-required');
       const fields = document.getElementById('acn-fields');
@@ -780,6 +1277,34 @@
         fields.classList.remove('hidden');
       } else {
         fields.classList.add('hidden');
+      }
+    }
+    
+    function loadNetworkVisualization() {
+      if (networkConfig) {
+        document.getElementById('stat-sites').textContent = networkConfig.topology?.sites || '-';
+        document.getElementById('stat-users').textContent = networkConfig.topology?.users || '-';
+        
+        const vlanCount = networkConfig.topology?.vlans ? networkConfig.topology.vlans.split(',').length : 0;
+        document.getElementById('stat-vlans').textContent = vlanCount || '-';
+        
+        let securityLevel = 'Base';
+        if (networkConfig.security?.firewallType && networkConfig.security?.antimalware !== 'none' && networkConfig.monitoring?.siem !== 'no') {
+          securityLevel = 'Alto';
+        } else if (networkConfig.security?.firewallType) {
+          securityLevel = 'Medio';
+        }
+        document.getElementById('stat-security').textContent = securityLevel;
+        
+        if (networkConfig.security?.firewallType) {
+          const fwLabel = getLabelFromValue('firewall-type', networkConfig.security.firewallType);
+          document.getElementById('firewall-label').textContent = fwLabel.substring(0, 15);
+        }
+      } else {
+        document.getElementById('stat-sites').textContent = '-';
+        document.getElementById('stat-users').textContent = '-';
+        document.getElementById('stat-vlans').textContent = '-';
+        document.getElementById('stat-security').textContent = '-';
       }
     }
     
@@ -817,7 +1342,8 @@
       
       showSuccessMessage('✅ Incidente salvato con successo!');
       resetIncidentForm();
-      switchIncidentTab('list');
+      switchIncidentSubTab('list');
+      updateIncidentCount();
     }
     
     function resetIncidentForm() {
@@ -866,7 +1392,7 @@
     function getSeverityLabel(severity) {
       const labels = {
         'critical': '🔴 Critica',
-        'high': '🟠 Alta',
+        'high': '��� Alta',
         'medium': '🟡 Media',
         'low': '🔵 Bassa'
       };
@@ -965,6 +1491,7 @@
         incidents = incidents.filter(i => i.id !== incidentId);
         localStorage.setItem('incidents', JSON.stringify(incidents));
         renderIncidentsList();
+        updateIncidentCount();
         showSuccessMessage('✅ Incidente eliminato');
       }
     }
@@ -999,7 +1526,7 @@
       localStorage.setItem('incident_drafts', JSON.stringify(drafts));
       showSuccessMessage('💾 Bozza salvata!');
       resetIncidentForm();
-      switchIncidentTab('drafts');
+      switchIncidentSubTab('drafts');
     }
     
     function renderDraftsList() {
@@ -1062,7 +1589,7 @@
         document.getElementById('acn-fields').classList.remove('hidden');
       }
       
-      switchIncidentTab('new');
+      switchIncidentSubTab('new');
       showSuccessMessage('📝 Bozza caricata nel form');
     }
     
@@ -1319,7 +1846,7 @@
         </div>
         
         <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded">
-          <h4 class="text-lg font-bold text-gray-800 mb-4">📊 Monitoraggio e Logging</h4>
+          <h4 class="text-lg font-bold text-gray-800 mb-4">���� Monitoraggio e Logging</h4>
           <div class="grid grid-cols-2 gap-3 text-sm">
             <div><span class="font-medium">SIEM:</span> ${getLabelFromValue('siem', data.monitoring.siem)}</div>
             ${data.monitoring.siemProduct ? `<div><span class="font-medium">Soluzione:</span> ${data.monitoring.siemProduct}</div>` : '<div></div>'}
@@ -1500,6 +2027,7 @@
       
       localStorage.setItem('network_config', JSON.stringify(networkConfig));
       showSuccessMessage('✅ Configurazione rete salvata con successo!');
+      updateNetworkStatus();
       
       currentNetworkStep = 1;
       document.querySelectorAll('.network-step').forEach(step => step.classList.add('hidden'));
@@ -1516,6 +2044,682 @@
         document.getElementById('network-step-1').classList.remove('hidden');
         updateNetworkStepIndicators();
         updateNetworkButtons();
+      }
+    }
+    
+    // === COMPANIES MANAGEMENT ===
+    let companies = JSON.parse(localStorage.getItem('companies') || '[]');
+    
+    // Initialize with demo data if empty
+    if (companies.length === 0) {
+      companies = [
+        {
+          id: 'COMP-001',
+          name: 'Acme Corporation SRL',
+          vat: '12345678901',
+          sector: 'ICT',
+          status: 'attivo',
+          complianceScore: 85,
+          employees: 150,
+          contactPerson: 'Mario Rossi',
+          email: 'mario.rossi@acme.it',
+          phone: '+39 02 1234567',
+          registeredAt: '2024-01-15T10:00:00Z',
+          lastAudit: '2024-03-10T14:30:00Z'
+        },
+        {
+          id: 'COMP-002',
+          name: 'TechnoServices SpA',
+          vat: '98765432109',
+          sector: 'Energia',
+          status: 'attivo',
+          complianceScore: 72,
+          employees: 450,
+          contactPerson: 'Laura Bianchi',
+          email: 'l.bianchi@techno.it',
+          phone: '+39 06 9876543',
+          registeredAt: '2024-02-20T09:15:00Z',
+          lastAudit: '2024-03-15T11:00:00Z'
+        },
+        {
+          id: 'COMP-003',
+          name: 'HealthCare Italia',
+          vat: '11223344556',
+          sector: 'Sanitario',
+          status: 'in-valutazione',
+          complianceScore: 45,
+          employees: 200,
+          contactPerson: 'Giuseppe Verdi',
+          email: 'g.verdi@healthcare.it',
+          phone: '+39 011 5556677',
+          registeredAt: '2024-03-01T16:45:00Z',
+          lastAudit: null
+        }
+      ];
+      localStorage.setItem('companies', JSON.stringify(companies));
+    }
+    
+    function renderCompaniesList() {
+      const container = document.getElementById('companies-list');
+      const searchTerm = document.getElementById('search-companies')?.value.toLowerCase() || '';
+      const statusFilter = document.getElementById('filter-company-status')?.value || '';
+      
+      let filtered = companies.filter(company => {
+        const matchesSearch = company.name.toLowerCase().includes(searchTerm) || 
+                            company.vat.includes(searchTerm) ||
+                            company.contactPerson.toLowerCase().includes(searchTerm);
+        const matchesStatus = !statusFilter || company.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+      
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 py-8">Nessuna azienda trovata</p>';
+        return;
+      }
+      
+      container.innerHTML = filtered.map(company => `
+        <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center space-x-3 mb-3">
+                <h3 class="text-xl font-bold text-gray-800">${company.name}</h3>
+                <span class="status-badge ${company.status === 'attivo' ? 'bg-green-100 text-green-800' : company.status === 'sospeso' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">
+                  ${company.status === 'attivo' ? '✅ Attivo' : company.status === 'sospeso' ? '⛔ Sospeso' : '⏳ In Valutazione'}
+                </span>
+              </div>
+              
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                  <p class="text-xs text-gray-500">P.IVA</p>
+                  <p class="text-sm font-medium text-gray-800">${company.vat}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Settore</p>
+                  <p class="text-sm font-medium text-gray-800">${company.sector}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Dipendenti</p>
+                  <p class="text-sm font-medium text-gray-800">${company.employees}</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500">Compliance Score</p>
+                  <p class="text-sm font-medium ${company.complianceScore >= 80 ? 'text-green-600' : company.complianceScore >= 60 ? 'text-yellow-600' : 'text-red-600'}">${company.complianceScore}%</p>
+                </div>
+              </div>
+              
+              <div class="flex items-center space-x-6 text-sm text-gray-600">
+                <span>👤 ${company.contactPerson}</span>
+                <span>📧 ${company.email}</span>
+                <span>📞 ${company.phone}</span>
+              </div>
+              
+              <div class="mt-3 text-xs text-gray-500">
+                <span>Registrata il: ${new Date(company.registeredAt).toLocaleDateString('it-IT')}</span>
+                ${company.lastAudit ? ` | Ultimo audit: ${new Date(company.lastAudit).toLocaleDateString('it-IT')}` : ' | Nessun audit'}
+              </div>
+            </div>
+            
+            <div class="flex flex-col space-y-2 ml-4">
+              <button onclick="viewCompanyDetails('${company.id}')" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg">
+                Dettagli
+              </button>
+              <button onclick="editCompany('${company.id}')" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm rounded-lg">
+                Modifica
+              </button>
+              <button onclick="deleteCompany('${company.id}')" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm rounded-lg">
+                Elimina
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('total-companies').textContent = companies.length;
+    }
+    
+    function filterCompanies() {
+      renderCompaniesList();
+    }
+    
+    function openAddCompanyModal() {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 modal-overlay flex items-center justify-center z-50';
+      modal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-t-xl">
+            <div class="flex justify-between items-center">
+              <h2 class="text-2xl font-bold">Aggiungi Nuova Azienda</h2>
+              <button onclick="this.closest('.modal-overlay').remove()" class="text-white hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <form id="add-company-form" onsubmit="saveNewCompany(event)" class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ragione Sociale *</label>
+                <input type="text" id="new-company-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Partita IVA *</label>
+                <input type="text" id="new-company-vat" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Settore *</label>
+                <select id="new-company-sector" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                  <option value="">Seleziona</option>
+                  <option value="Energia">Energia</option>
+                  <option value="Trasporti">Trasporti</option>
+                  <option value="Bancario">Bancario</option>
+                  <option value="Sanitario">Sanitario</option>
+                  <option value="ICT">ICT</option>
+                  <option value="Pubblica Amministrazione">Pubblica Amministrazione</option>
+                  <option value="Altro">Altro</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Numero Dipendenti *</label>
+                <input type="number" id="new-company-employees" required min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Referente *</label>
+                <input type="text" id="new-company-contact" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input type="email" id="new-company-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Telefono *</label>
+                <input type="tel" id="new-company-phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 pt-6 border-t">
+              <button type="button" onclick="this.closest('.modal-overlay').remove()" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg">
+                Annulla
+              </button>
+              <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                Salva Azienda
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    
+    function saveNewCompany(event) {
+      event.preventDefault();
+      
+      const newCompany = {
+        id: 'COMP-' + String(companies.length + 1).padStart(3, '0'),
+        name: document.getElementById('new-company-name').value,
+        vat: document.getElementById('new-company-vat').value,
+        sector: document.getElementById('new-company-sector').value,
+        employees: parseInt(document.getElementById('new-company-employees').value),
+        contactPerson: document.getElementById('new-company-contact').value,
+        email: document.getElementById('new-company-email').value,
+        phone: document.getElementById('new-company-phone').value,
+        status: 'in-valutazione',
+        complianceScore: 0,
+        registeredAt: new Date().toISOString(),
+        lastAudit: null
+      };
+      
+      companies.push(newCompany);
+      localStorage.setItem('companies', JSON.stringify(companies));
+      
+      document.querySelector('.modal-overlay').remove();
+      renderCompaniesList();
+      showSuccessMessage('✅ Azienda aggiunta con successo!');
+    }
+    
+    function viewCompanyDetails(companyId) {
+      const company = companies.find(c => c.id === companyId);
+      if (!company) return;
+      
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 modal-overlay flex items-center justify-center z-50';
+      modal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-t-xl">
+            <div class="flex justify-between items-start">
+              <div>
+                <h2 class="text-2xl font-bold mb-2">${company.name}</h2>
+                <p class="text-blue-100">ID: ${company.id}</p>
+              </div>
+              <button onclick="this.closest('.modal-overlay').remove()" class="text-white hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <div class="p-6 space-y-6">
+            <div class="grid grid-cols-2 gap-6">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Partita IVA</h3>
+                <p class="text-lg font-semibold text-gray-800">${company.vat}</p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Settore</h3>
+                <p class="text-lg font-semibold text-gray-800">${company.sector}</p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Dipendenti</h3>
+                <p class="text-lg font-semibold text-gray-800">${company.employees}</p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Stato</h3>
+                <p class="text-lg font-semibold ${company.status === 'attivo' ? 'text-green-600' : company.status === 'sospeso' ? 'text-red-600' : 'text-yellow-600'}">
+                  ${company.status === 'attivo' ? '✅ Attivo' : company.status === 'sospeso' ? '⛔ Sospeso' : '⏳ In Valutazione'}
+                </p>
+              </div>
+            </div>
+            
+            <div class="border-t pt-6">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Compliance Score</h3>
+              <div class="flex items-center space-x-4">
+                <div class="flex-1 bg-gray-200 rounded-full h-4">
+                  <div class="h-4 rounded-full ${company.complianceScore >= 80 ? 'bg-green-500' : company.complianceScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'}" style="width: ${company.complianceScore}%"></div>
+                </div>
+                <span class="text-2xl font-bold ${company.complianceScore >= 80 ? 'text-green-600' : company.complianceScore >= 60 ? 'text-yellow-600' : 'text-red-600'}">${company.complianceScore}%</span>
+              </div>
+            </div>
+            
+            <div class="border-t pt-6">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Contatti</h3>
+              <div class="space-y-2">
+                <p><span class="font-medium">Referente:</span> ${company.contactPerson}</p>
+                <p><span class="font-medium">Email:</span> ${company.email}</p>
+                <p><span class="font-medium">Telefono:</span> ${company.phone}</p>
+              </div>
+            </div>
+            
+            <div class="border-t pt-6">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Timeline</h3>
+              <div class="space-y-2 text-sm text-gray-600">
+                <p>📅 Registrata il: ${new Date(company.registeredAt).toLocaleString('it-IT')}</p>
+                ${company.lastAudit ? `<p>🔍 Ultimo audit: ${new Date(company.lastAudit).toLocaleString('it-IT')}</p>` : '<p>🔍 Nessun audit effettuato</p>'}
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 p-6 rounded-b-xl flex justify-end">
+            <button onclick="this.closest('.modal-overlay').remove()" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg">
+              Chiudi
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    
+    function editCompany(companyId) {
+      showSuccessMessage('🔧 Funzione modifica in sviluppo');
+    }
+    
+    function deleteCompany(companyId) {
+      if (confirm('Sei sicuro di voler eliminare questa azienda?')) {
+        companies = companies.filter(c => c.id !== companyId);
+        localStorage.setItem('companies', JSON.stringify(companies));
+        renderCompaniesList();
+        showSuccessMessage('✅ Azienda eliminata');
+      }
+    }
+    
+    // === USERS MANAGEMENT ===
+    let users = JSON.parse(localStorage.getItem('platform_users') || '[]');
+    
+    // Initialize with demo data if empty
+    if (users.length === 0) {
+      users = [
+        {
+          id: 'USR-001',
+          name: 'Admin Sistema',
+          email: 'admin@csirt.it',
+          role: 'admin',
+          company: null,
+          status: 'attivo',
+          lastLogin: '2024-03-20T09:30:00Z',
+          createdAt: '2024-01-01T00:00:00Z'
+        },
+        {
+          id: 'USR-002',
+          name: 'Marco Rossi',
+          email: 'csirt@hub.it',
+          role: 'csirt',
+          company: null,
+          status: 'attivo',
+          lastLogin: '2024-03-19T14:22:00Z',
+          createdAt: '2024-01-15T10:00:00Z'
+        },
+        {
+          id: 'USR-003',
+          name: 'Giuseppe Verdi',
+          email: 'azienda@test.it',
+          role: 'azienda',
+          company: 'Azienda Test SRL',
+          status: 'attivo',
+          lastLogin: '2024-03-18T16:45:00Z',
+          createdAt: '2024-02-01T09:00:00Z'
+        },
+        {
+          id: 'USR-004',
+          name: 'Laura Bianchi',
+          email: 'l.bianchi@techno.it',
+          role: 'azienda',
+          company: 'TechnoServices SpA',
+          status: 'attivo',
+          lastLogin: '2024-03-17T11:30:00Z',
+          createdAt: '2024-02-10T14:20:00Z'
+        },
+        {
+          id: 'USR-005',
+          name: 'Paolo Neri',
+          email: 'p.neri@example.it',
+          role: 'csirt',
+          company: null,
+          status: 'sospeso',
+          lastLogin: '2024-02-28T08:15:00Z',
+          createdAt: '2024-01-20T12:00:00Z'
+        }
+      ];
+      localStorage.setItem('platform_users', JSON.stringify(users));
+    }
+    
+    function renderUsersTable() {
+      const tbody = document.getElementById('users-table-body');
+      const searchTerm = document.getElementById('search-users')?.value.toLowerCase() || '';
+      const roleFilter = document.getElementById('filter-user-role')?.value || '';
+      const statusFilter = document.getElementById('filter-user-status')?.value || '';
+      
+      let filtered = users.filter(user => {
+        const matchesSearch = user.name.toLowerCase().includes(searchTerm) || 
+                            user.email.toLowerCase().includes(searchTerm) ||
+                            (user.company && user.company.toLowerCase().includes(searchTerm));
+        const matchesRole = !roleFilter || user.role === roleFilter;
+        const matchesStatus = !statusFilter || user.status === statusFilter;
+        return matchesSearch && matchesRole && matchesStatus;
+      });
+      
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Nessun utente trovato</td></tr>';
+        return;
+      }
+      
+      const roleLabels = {
+        'admin': '👑 Amministratore',
+        'csirt': '🛡️ CSIRT',
+        'azienda': '🏢 Aziendale'
+      };
+      
+      tbody.innerHTML = filtered.map(user => `
+        <tr class="hover:bg-gray-50">
+          <td class="px-4 py-4">
+            <div class="flex items-center">
+              <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                ${user.name.charAt(0)}
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-900">${user.name}</p>
+                <p class="text-xs text-gray-500">${user.id}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-4 text-sm text-gray-900">${user.email}</td>
+          <td class="px-4 py-4">
+            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+              user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 
+              user.role === 'csirt' ? 'bg-blue-100 text-blue-800' : 
+              'bg-green-100 text-green-800'
+            }">
+              ${roleLabels[user.role]}
+            </span>
+          </td>
+          <td class="px-4 py-4 text-sm text-gray-900">${user.company || '-'}</td>
+          <td class="px-4 py-4">
+            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+              user.status === 'attivo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+            }">
+              ${user.status === 'attivo' ? '✅ Attivo' : '⛔ Sospeso'}
+            </span>
+          </td>
+          <td class="px-4 py-4 text-sm text-gray-500">${user.lastLogin ? new Date(user.lastLogin).toLocaleString('it-IT') : 'Mai'}</td>
+          <td class="px-4 py-4 text-center">
+            <div class="flex justify-center space-x-2">
+              <button onclick="viewUserDetails('${user.id}')" class="text-blue-600 hover:text-blue-800" title="Dettagli">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+              <button onclick="editUser('${user.id}')" class="text-yellow-600 hover:text-yellow-800" title="Modifica">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <button onclick="toggleUserStatus('${user.id}')" class="text-${user.status === 'attivo' ? 'red' : 'green'}-600 hover:text-${user.status === 'attivo' ? 'red' : 'green'}-800" title="${user.status === 'attivo' ? 'Sospendi' : 'Attiva'}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${user.status === 'attivo' ? 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'}"/></svg>
+              </button>
+              <button onclick="deleteUser('${user.id}')" class="text-red-600 hover:text-red-800" title="Elimina">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    function filterUsers() {
+      renderUsersTable();
+    }
+    
+    function openAddUserModal() {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 modal-overlay flex items-center justify-center z-50';
+      modal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-t-xl">
+            <div class="flex justify-between items-center">
+              <h2 class="text-2xl font-bold">Aggiungi Nuovo Utente</h2>
+              <button onclick="this.closest('.modal-overlay').remove()" class="text-white hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <form id="add-user-form" onsubmit="saveNewUser(event)" class="p-6 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo *</label>
+                <input type="text" id="new-user-name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <input type="email" id="new-user-email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ruolo *</label>
+                <select id="new-user-role" required class="w-full px-4 py-2 border border-gray-300 rounded-lg" onchange="toggleCompanyField()">
+                  <option value="">Seleziona</option>
+                  <option value="admin">Amministratore</option>
+                  <option value="csirt">Consulente CSIRT</option>
+                  <option value="azienda">Referente Aziendale</option>
+                </select>
+              </div>
+              
+              <div id="company-field" class="hidden">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Azienda</label>
+                <select id="new-user-company" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                  <option value="">Seleziona azienda</option>
+                  ${companies.map(c => `<option value="${c.name}">${c.name}</option>`).join('')}
+                </select>
+              </div>
+              
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Password Temporanea *</label>
+                <input type="password" id="new-user-password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                <p class="text-xs text-gray-500 mt-1">L'utente dovrà cambiarla al primo accesso</p>
+              </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 pt-6 border-t">
+              <button type="button" onclick="this.closest('.modal-overlay').remove()" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg">
+                Annulla
+              </button>
+              <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                Crea Utente
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    
+    function toggleCompanyField() {
+      const role = document.getElementById('new-user-role').value;
+      const companyField = document.getElementById('company-field');
+      if (role === 'azienda') {
+        companyField.classList.remove('hidden');
+        document.getElementById('new-user-company').required = true;
+      } else {
+        companyField.classList.add('hidden');
+        document.getElementById('new-user-company').required = false;
+      }
+    }
+    
+    function saveNewUser(event) {
+      event.preventDefault();
+      
+      const role = document.getElementById('new-user-role').value;
+      const newUser = {
+        id: 'USR-' + String(users.length + 1).padStart(3, '0'),
+        name: document.getElementById('new-user-name').value,
+        email: document.getElementById('new-user-email').value,
+        role: role,
+        company: role === 'azienda' ? document.getElementById('new-user-company').value : null,
+        status: 'attivo',
+        lastLogin: null,
+        createdAt: new Date().toISOString()
+      };
+      
+      users.push(newUser);
+      localStorage.setItem('platform_users', JSON.stringify(users));
+      
+      document.querySelector('.modal-overlay').remove();
+      renderUsersTable();
+      showSuccessMessage('✅ Utente creato con successo!');
+    }
+    
+    function viewUserDetails(userId) {
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+      
+      const roleLabels = {
+        'admin': '👑 Amministratore',
+        'csirt': '🛡️ Consulente CSIRT',
+        'azienda': '🏢 Referente Aziendale'
+      };
+      
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 modal-overlay flex items-center justify-center z-50';
+      modal.innerHTML = `
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4">
+          <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-t-xl">
+            <div class="flex justify-between items-start">
+              <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold">
+                  ${user.name.charAt(0)}
+                </div>
+                <div>
+                  <h2 class="text-2xl font-bold">${user.name}</h2>
+                  <p class="text-blue-100">${roleLabels[user.role]}</p>
+                </div>
+              </div>
+              <button onclick="this.closest('.modal-overlay').remove()" class="text-white hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <div class="p-6 space-y-6">
+            <div class="grid grid-cols-2 gap-6">
+              <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">ID Utente</h3>
+                <p class="text-lg font-semibold text-gray-800">${user.id}</p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Email</h3>
+                <p class="text-lg font-semibold text-gray-800">${user.email}</p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Azienda</h3>
+                <p class="text-lg font-semibold text-gray-800">${user.company || 'N/A'}</p>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-500 mb-1">Stato</h3>
+                <p class="text-lg font-semibold ${user.status === 'attivo' ? 'text-green-600' : 'text-red-600'}">
+                  ${user.status === 'attivo' ? '✅ Attivo' : '⛔ Sospeso'}
+                </p>
+              </div>
+            </div>
+            
+            <div class="border-t pt-6">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Cronologia Accessi</h3>
+              <div class="space-y-2 text-sm text-gray-600">
+                <p>📅 Account creato: ${new Date(user.createdAt).toLocaleString('it-IT')}</p>
+                <p>🔐 Ultimo accesso: ${user.lastLogin ? new Date(user.lastLogin).toLocaleString('it-IT') : 'Mai effettuato'}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 p-6 rounded-b-xl flex justify-end space-x-4">
+            <button onclick="editUser('${user.id}')" class="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg">
+              Modifica
+            </button>
+            <button onclick="this.closest('.modal-overlay').remove()" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg">
+              Chiudi
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    
+    function editUser(userId) {
+      showSuccessMessage('🔧 Funzione modifica in sviluppo');
+    }
+    
+    function toggleUserStatus(userId) {
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+      
+      user.status = user.status === 'attivo' ? 'sospeso' : 'attivo';
+      localStorage.setItem('platform_users', JSON.stringify(users));
+      renderUsersTable();
+      showSuccessMessage(`✅ Utente ${user.status === 'attivo' ? 'attivato' : 'sospeso'}`);
+    }
+    
+    function deleteUser(userId) {
+      if (confirm('Sei sicuro di voler eliminare questo utente?')) {
+        users = users.filter(u => u.id !== userId);
+        localStorage.setItem('platform_users', JSON.stringify(users));
+        renderUsersTable();
+        showSuccessMessage('✅ Utente eliminato');
       }
     }
     
@@ -1570,6 +2774,7 @@
       
       localStorage.setItem('designation_data', JSON.stringify(designationData));
       showSuccessMessage('✅ Designazione salvata con successo!');
+      updateDesignationStatus();
     }
     
     function resetDesignationForm() {
@@ -1630,5 +2835,6 @@
       }, 500);
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9aad7b9486b4edde',t:'MTc2NTIwOTcwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  </div>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9aadaa185778ed97',t:'MTc2NTIxMTYwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
