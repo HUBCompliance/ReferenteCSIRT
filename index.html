@@ -358,6 +358,8 @@
         .status-aperto { background: #ffc107; color: #333; }
         .status-in-corso { background: #17a2b8; color: white; }
         .status-risolto { background: #28a745; color: white; }
+        .status-notificata-acn { background: #007bff; color: white; }
+
 
         .incident-details {
             color: #666;
@@ -483,7 +485,7 @@
      <button class="nav-btn" onclick="showSection('configurazione')" data-permission="admin,csirt,company">🌐 Configurazione Rete</button>
      <button class="nav-btn" onclick="showSection('incidenti')" data-permission="admin,csirt,company">🚨 Incidenti</button>
      <button class="nav-btn" onclick="showSection('visualizza')" data-permission="admin,csirt,company">📊 Visualizza Dati</button>
-     <button class="nav-btn" onclick="showSection('utenti')" data-permission="admin">👥 Gestione Utenti</button>
+     <button class="nav-btn" onclick="showSection('notifiche')" data-permission="admin,csirt,company">🔔 Notifiche</button> <button class="nav-btn" onclick="showSection('utenti')" data-permission="admin">👥 Gestione Utenti</button>
     </nav>
     <div class="content">
      <section id="designazione" class="section active">
@@ -527,35 +529,83 @@
        <h3 class="subsection-title">Referente Principale CSIRT</h3>
        <div class="form-row">
         <div class="form-group">
-         <label for="main_name">Nome *</label>
+         <label for="data_nomina">Data Nomina *</label>
+         <input type="date" id="data_nomina" required>
+        </div>
+        <div class="form-group">
+         <label for="main_role">Ruolo Aziendale *</label>
+         <input type="text" id="main_role" required>
+        </div>
+        <div class="form-group">
+         <label for="main_name">Nome Referente *</label>
          <input type="text" id="main_name" required>
         </div>
         <div class="form-group">
-         <label for="main_surname">Cognome *</label>
+         <label for="main_surname">Cognome Referente *</label>
          <input type="text" id="main_surname" required>
-        </div>
-        <div class="form-group">
-         <label for="main_fiscal_code">Codice Fiscale *</label>
-         <input type="text" id="main_fiscal_code" required>
         </div>
        </div>
        <div class="form-row">
         <div class="form-group">
-         <label for="main_role">Ruolo/Qualifica *</label>
-         <input type="text" id="main_role" required>
+         <label for="main_fiscal_code">Codice Fiscale Referente *</label>
+         <input type="text" id="main_fiscal_code" required>
         </div>
         <div class="form-group">
-         <label for="main_email">Email *</label>
+         <label for="main_email">Email Referente *</label>
          <input type="email" id="main_email" required>
         </div>
         <div class="form-group">
-         <label for="main_phone">Telefono *</label>
+         <label for="main_phone">Telefono Reperibilità *</label>
          <input type="tel" id="main_phone" required>
         </div>
+       </div>
+       <h3 class="subsection-title">Punto di Contatto (ACN / Autorità)</h3>
+       <div class="form-row">
         <div class="form-group">
-         <label for="main_pec">PEC</label>
-         <input type="email" id="main_pec">
+         <label for="acn_contact_name">Nome Contatto *</label>
+         <input type="text" id="acn_contact_name" required>
         </div>
+        <div class="form-group">
+         <label for="acn_contact_surname">Cognome Contatto *</label>
+         <input type="text" id="acn_contact_surname" required>
+        </div>
+        <div class="form-group">
+         <label for="acn_contact_email">Email Contatto *</label>
+         <input type="email" id="acn_contact_email" required>
+        </div>
+       </div>
+       <h3 class="subsection-title">Sostituti (Backup Referente)</h3>
+       <div class="form-row">
+        <div class="form-group">
+         <label for="sub_1_name">Nome Sostituto 1</label>
+         <input type="text" id="sub_1_name">
+        </div>
+        <div class="form-group">
+         <label for="sub_1_surname">Cognome Sostituto 1</label>
+         <input type="text" id="sub_1_surname">
+        </div>
+        <div class="form-group">
+         <label for="sub_1_email">Email Sostituto 1</label>
+         <input type="email" id="sub_1_email">
+        </div>
+       </div>
+       <div class="form-row">
+        <div class="form-group">
+         <label for="sub_2_name">Nome Sostituto 2</label>
+         <input type="text" id="sub_2_name">
+        </div>
+        <div class="form-group">
+         <label for="sub_2_surname">Cognome Sostituto 2</label>
+         <input type="text" id="sub_2_surname">
+        </div>
+        <div class="form-group">
+         <label for="sub_2_email">Email Sostituto 2</label>
+         <input type="email" id="sub_2_email">
+        </div>
+       </div>
+       <div class="form-group">
+        <label for="motivation_notes">Motivazione Scelta Esterna / Note (Opzionale)</label>
+        <textarea id="motivation_notes"></textarea>
        </div>
        <button type="submit" class="submit-btn">💾 Salva Designazione</button>
       </form>
@@ -682,6 +732,57 @@
        </div>
       </div>
      </section>
+     <section id="notifiche" class="section">
+      <h2 class="section-title">🔔 Gestione Notifiche ACN/Autorità</h2>
+      <div id="notifiche-message" class="message"></div>
+      <form id="notifiche-form">
+       <div class="form-group">
+        <label for="notif_incident_id">Seleziona Incidente da Notificare *</label>
+        <select id="notif_incident_id" required>
+         <option value="">Caricamento incidenti...</option>
+        </select>
+       </div>
+       <h3 class="subsection-title">Dettagli Notifica</h3>
+       <div class="form-row">
+        <div class="form-group">
+         <label for="notif_status">Stato Notifica *</label>
+         <select id="notif_status" required>
+          <option value="Aperta">Aperta</option>
+          <option value="Notificata ACN">Notificata ACN</option>
+          <option value="Chiusa">Chiusa</option>
+         </select>
+        </div>
+        <div class="form-group">
+         <label for="notif_notification_title">Titolo Incidente (Riferimento)</label>
+         <input type="text" id="notif_notification_title" disabled>
+        </div>
+        <div class="form-group">
+         <label for="notif_datetime">Data e Ora Incidente</label>
+         <input type="datetime-local" id="notif_datetime" disabled>
+        </div>
+       </div>
+       <div class="form-group">
+        <label for="notif_impact_notes">Descrizione Danno/Impatto (Note)</label>
+        <textarea id="notif_impact_notes" rows="3"></textarea>
+       </div>
+       <h3 class="subsection-title">Follow-up e Correzioni</h3>
+       <div class="form-group">
+        <label for="notif_risk_damage_notes">Valutazione Rischio e Danno (Note)</label>
+        <textarea id="notif_risk_damage_notes" rows="3"></textarea>
+       </div>
+       <div class="form-group">
+        <label for="notif_corrective_actions_notes">Azioni Correttive Adottate (Note)</label>
+        <textarea id="notif_corrective_actions_notes" rows="3"></textarea>
+       </div>
+       <button type="submit" class="submit-btn">💾 Salva Notifica</button>
+      </form>
+      <h3 class="subsection-title" style="margin-top: 50px;">Notifiche Inviate</h3>
+      <div id="notifications-list" class="incidents-grid">
+       <div class="loading">
+        Caricamento notifiche...
+       </div>
+      </div>
+     </section>
      <section id="utenti" class="section">
       <h2 class="section-title">👥 Gestione Utenti</h2>
       <div id="utenti-message" class="message"></div>
@@ -741,6 +842,7 @@
         // Variabili globali
         let currentUser = null;
         let currentCompanies = [];
+        let currentIncidents = []; // Aggiunto per le notifiche
 
         // Esegui il controllo della sessione all'avvio
         document.addEventListener('DOMContentLoaded', checkSession);
@@ -758,7 +860,6 @@
 
         // Funzione per ottenere i dettagli del profilo, incluso il RUOLO
         async function getProfile(userId) {
-            // Nota: RLS su profiles è selettiva (solo self-read) per evitare ricorsioni
             const { data, error } = await supabase
                 .from('profiles')
                 .select(`role, company_id, name, csirtcompanies(name)`)
@@ -766,7 +867,7 @@
                 .single();
 
             if (error) {
-                console.error('Errore nel recupero del profilo:', error, "Causa probabile: RLS di profiles troppo restrittiva.");
+                console.error('Errore nel recupero del profilo:', error);
                 return null;
             }
             return data;
@@ -924,7 +1025,6 @@
             });
             
             document.getElementById(sectionName).classList.add('active');
-            // Nota: event.target è implicito in questo contesto
             const clickedButton = document.querySelector(`.nav-btn[onclick*="${sectionName}"]`);
             if (clickedButton) {
                  clickedButton.classList.add('active');
@@ -935,6 +1035,9 @@
                 loadCompaniesForSelect();
             } else if (sectionName === 'visualizza') {
                 loadIncidents();
+            } else if (sectionName === 'notifiche') { 
+                loadIncidentsForSelect(); // Carica gli incidenti per la select
+                loadNotifications(); // Carica le notifiche esistenti
             } else if (sectionName === 'utenti') {
                 loadUsers();
                 loadCompaniesForUserForm();
@@ -942,7 +1045,7 @@
         }
 
         // =================================================================
-        // === GESTIONE AZIENDE E SELECT (PROBLEMA DI VISIBILITÀ) ===
+        // === GESTIONE AZIENDE E SELECT ===
         // =================================================================
 
         // Carica aziende per le select (L'Admin deve vedere tutte)
@@ -959,14 +1062,13 @@
             try {
                 let query = supabase.from('csirtcompanies').select('id, name');
                 
-                // Se utente aziendale, filtra solo la sua azienda
                 if (currentUser.role === 'company' && currentUser.company_id) {
                     query = query.eq('id', currentUser.company_id);
                 }
                 
                 const { data, error } = await query.order('name');
 
-                if (error) throw error; // Se RLS è configurata male, questo non viene MAI lanciato.
+                if (error) throw error; 
 
                 currentCompanies = data || [];
 
@@ -987,12 +1089,12 @@
             } catch (error) {
                 console.error('Errore caricamento aziende (DB):', error);
                 selects.forEach(select => {
-                    select.innerHTML = '<option value="">Errore caricamento</option>';
+                    select.innerHTML = '<option value="">Errore RLS/Caricamento</option>';
                 });
             }
         }
 
-        // Form Designazione (SALVATAGGIO ATOMICO)
+        // Form Designazione (SALVATAGGIO ATOMICO E COMPLETO)
         document.getElementById('designazione-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -1006,7 +1108,7 @@
             submitBtn.textContent = '⏳ Salvataggio...';
 
             try {
-                // 1. Dati Azienda (csirtcompanies) - Campi essenziali che non erano il problema
+                // 1. Dati Azienda (csirtcompanies)
                 const companyData = {
                     name: document.getElementById('company_name').value,
                     vat_number: document.getElementById('company_vat').value,
@@ -1024,16 +1126,26 @@
 
                 if (companyError) throw companyError;
 
-                // 2. Dati Referente (csirtdesignations) - SOLO campi del referente e la CHIAVE ESTERNA
+                // 2. Dati Referente (csirtdesignations) - NUOVO SCHEMA ESTESO
                 const designationData = {
-                    company_id: company.id, // CHIAVE ESTERNA
+                    company_id: company.id, 
+                    data_nomina: document.getElementById('data_nomina').value,
+                    main_role: document.getElementById('main_role').value,
                     main_name: document.getElementById('main_name').value,
                     main_surname: document.getElementById('main_surname').value,
                     main_fiscal_code: document.getElementById('main_fiscal_code').value,
-                    main_role: document.getElementById('main_role').value,
                     main_email: document.getElementById('main_email').value,
                     main_phone: document.getElementById('main_phone').value,
-                    main_pec: document.getElementById('main_pec').value
+                    acn_contact_name: document.getElementById('acn_contact_name').value,
+                    acn_contact_surname: document.getElementById('acn_contact_surname').value,
+                    acn_contact_email: document.getElementById('acn_contact_email').value,
+                    sub_1_name: document.getElementById('sub_1_name').value || null,
+                    sub_1_surname: document.getElementById('sub_1_surname').value || null,
+                    sub_1_email: document.getElementById('sub_1_email').value || null,
+                    sub_2_name: document.getElementById('sub_2_name').value || null,
+                    sub_2_surname: document.getElementById('sub_2_surname').value || null,
+                    sub_2_email: document.getElementById('sub_2_email').value || null,
+                    motivation_notes: document.getElementById('motivation_notes').value || null
                 };
 
                 // Salvataggio/Aggiornamento Designazione (Conflitto su company_id)
@@ -1044,7 +1156,6 @@
                 if (designationError) throw designationError;
 
                 displayMessage('designazione-message', 'success', '✅ Designazione salvata con successo!');
-                // Non resettare il form per permettere all'utente di vedere l'ID generato
                 loadCompaniesForSelect(); 
 
             } catch (error) {
@@ -1057,13 +1168,9 @@
         });
         
         // =================================================================
-        // === ALTRE FUNZIONI (OMESSE PER BREVITÀ, ASSUMONO IL FUNZIONAMENTO) ===
+        // === GESTIONE CONFIGURAZIONE ===
         // =================================================================
 
-        // [Le funzioni loadIncidents, loadUsers, etc., sono omesse per brevità nel blocco di codice]
-
-        // Resto del codice...
-        
         // Form Configurazione (UPSERT)
         document.getElementById('configurazione-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1100,6 +1207,10 @@
             }
         });
 
+        // =================================================================
+        // === GESTIONE INCIDENTI ===
+        // =================================================================
+
         // Form Incidenti (INSERT)
         document.getElementById('incidenti-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1109,15 +1220,20 @@
             submitBtn.textContent = '⏳ Salvataggio...';
 
             try {
+                const incidentId = document.getElementById('inc_company_id').value;
+                
+                // Nota: RLS INSERT su csirtincidents richiede che l'ID azienda sia quello dell'utente loggato se non Admin/CSIRT
+                // Il controllo è fatto tramite la Policy RLS
+                
                 const incidentData = {
-                    company_id: document.getElementById('inc_company_id').value,
+                    company_id: incidentId,
                     title: document.getElementById('inc_title').value,
                     incident_datetime: document.getElementById('inc_datetime').value,
                     severity: document.getElementById('inc_severity').value,
                     status: document.getElementById('inc_status').value,
                     incident_type: document.getElementById('inc_type').value,
                     description: document.getElementById('inc_description').value,
-                    created_by: currentUser.id // Campo corretto
+                    created_by: currentUser.id 
                 };
 
                 const { error } = await supabase
@@ -1148,7 +1264,6 @@
                     .from('csirtincidents')
                     .select(`*, csirtcompanies(name)`);
                 
-                // Filtra per azienda se utente aziendale
                 if (currentUser.role === 'company' && currentUser.company_id) {
                     query = query.eq('company_id', currentUser.company_id);
                 }
@@ -1195,9 +1310,157 @@
             }
         }
 
+        // =================================================================
+        // === GESTIONE NOTIFICHE (NUOVA SEZIONE) ===
+        // =================================================================
+
+        // Carica incidenti per la Select delle Notifiche
+        async function loadIncidentsForSelect() {
+            const select = document.getElementById('notif_incident_id');
+            select.innerHTML = '<option value="">Caricamento...</option>';
+            
+            try {
+                let query = supabase.from('csirtincidents').select('id, title, incident_datetime, company_id');
+                
+                if (currentUser.role === 'company' && currentUser.company_id) {
+                    query = query.eq('company_id', currentUser.company_id);
+                }
+                
+                const { data, error } = await query.order('incident_datetime', { ascending: false });
+
+                if (error) throw error;
+                
+                currentIncidents = data || [];
+                select.innerHTML = '<option value="">Seleziona un incidente...</option>';
+                
+                currentIncidents.forEach(incident => {
+                    select.innerHTML += `<option value="${incident.id}">${incident.title} (${new Date(incident.incident_datetime).toLocaleDateString('it-IT')})</option>`;
+                });
+                
+            } catch (error) {
+                console.error('Errore caricamento incidenti per select:', error);
+                select.innerHTML = '<option value="">Errore caricamento incidenti</option>';
+            }
+        }
+
+        // Pre-popola i campi in base all'incidente selezionato
+        document.getElementById('notif_incident_id').addEventListener('change', function() {
+            const selectedId = this.value;
+            const incident = currentIncidents.find(i => i.id === selectedId);
+            
+            if (incident) {
+                document.getElementById('notif_notification_title').value = incident.title;
+                // Formatta la data per l'input datetime-local (taglia i secondi e la Z)
+                const formattedDate = incident.incident_datetime.substring(0, 19).replace('T', ' ');
+                document.getElementById('notif_datetime').value = incident.incident_datetime.substring(0, 16);
+            } else {
+                document.getElementById('notif_notification_title').value = '';
+                document.getElementById('notif_datetime').value = '';
+            }
+        });
+
+        // Form Notifiche (INSERT)
+        document.getElementById('notifiche-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Invio Notifica...';
+
+            try {
+                const incidentId = document.getElementById('notif_incident_id').value;
+                const incident = currentIncidents.find(i => i.id === incidentId);
+                
+                if (!incident) {
+                    throw new Error("Seleziona un incidente valido.");
+                }
+                
+                const notificationData = {
+                    incident_id: incidentId,
+                    company_id: incident.company_id, // Preso dall'incidente per RLS e coerenza
+                    notification_title: document.getElementById('notif_notification_title').value,
+                    notification_datetime: incident.incident_datetime, // Usiamo la data originale dell'incidente
+                    impact_notes: document.getElementById('notif_impact_notes').value,
+                    status: document.getElementById('notif_status').value,
+                    risk_damage_notes: document.getElementById('notif_risk_damage_notes').value,
+                    corrective_actions_notes: document.getElementById('notif_corrective_actions_notes').value,
+                };
+
+                const { error } = await supabase
+                    .from('csirtnotifications')
+                    .insert([notificationData]);
+
+                if (error) throw error;
+
+                displayMessage('notifiche-message', 'success', '✅ Notifica salvata e inviata!');
+                e.target.reset();
+                loadNotifications(); // Aggiorna la lista
+                
+            } catch (error) {
+                console.error('Errore:', error);
+                displayMessage('notifiche-message', 'error', '❌ Errore: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '💾 Salva Notifica';
+            }
+        });
+
+        // Carica la lista delle notifiche
+        async function loadNotifications() {
+            const container = document.getElementById('notifications-list');
+            container.innerHTML = '<div class="loading">⏳ Caricamento notifiche...</div>';
+
+            try {
+                const { data, error } = await supabase
+                    .from('csirtnotifications')
+                    .select(`*, csirtincidents(title)`) // Solo il titolo è sufficiente per il JOIN
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `<div class="empty-state">Nessuna notifica trovata.</div>`;
+                    return;
+                }
+
+                container.innerHTML = data.map(notif => {
+                    const statusClass = notif.status.toLowerCase().replace(' ', '-');
+                    const incidentRef = notif.csirtincidents?.title || 'Incidente Rimosso';
+
+                    return `
+                        <div class="incident-card" style="border-left: 5px solid #667eea;">
+                            <div class="incident-header">
+                                <div>
+                                    <h3 class="incident-title">Notifica: ${incidentRef}</h3>
+                                    <p style="color: #666; margin-top: 5px;">
+                                        Incidente ID: ${notif.incident_id.substring(0, 8)}... •
+                                        Stato: <span class="status-badge status-${statusClass}">${notif.status}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="incident-details">
+                                <p><strong>Danno/Impatto:</strong> ${notif.impact_notes || '-'}</p>
+                                <p><strong>Valutazione Rischio:</strong> ${notif.risk_damage_notes || '-'}</p>
+                                <p><strong>Azioni Correttive:</strong> ${notif.corrective_actions_notes || '-'}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Errore caricamento notifiche:', error);
+                container.innerHTML = `<div class="message error">❌ Errore: ${error.message}</div>`;
+            }
+        }
+
+        // =================================================================
+        // === GESTIONE UTENTI ===
+        // =================================================================
+
         // Carica aziende per form utenti (rimane come prima)
         async function loadCompaniesForUserForm() {
             try {
+                // Admin deve vedere tutte le aziende per associare l'utente
                 const { data, error } = await supabase
                     .from('csirtcompanies')
                     .select('id, name')
