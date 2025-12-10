@@ -733,8 +733,8 @@
         // === CONFIGURAZIONE SUPABASE - INSERIRE LE PROPRIE CHIAVI QUI ===
         // =================================================================
         // **UTILIZZARE SOLO LA CHIAVE ANONIMA PUBBLICA (anon key)**
-        const SUPABASE_URL = 'https://gkoqpayaddyzmgfnripx.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdrb3FwYXlhZGR5em1nZm5yaXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNTU4NzUsImV4cCI6MjA3OTgzMTg3NX0.4fYTxWxxxcbMzdP7-Xu2SGfv0TEqFk67G7pJ6K-8ayg'; 
+        const SUPABASE_URL = 'https://gkoqpayaddyzmgfnripx.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdrb3FwYXlhZGR5em1nZm5yaXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNTU4NzUsImV4cCI6MjA3OTgzMTg3NX0.4fYTxWxxxcbMzdP7-Xu2SGfv0TEqFk67G7pJ6K-8ayg'; 
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -758,6 +758,7 @@
 
         // Funzione per ottenere i dettagli del profilo, incluso il RUOLO
         async function getProfile(userId) {
+            // Nota: RLS su profiles è selettiva (solo self-read) per evitare ricorsioni
             const { data, error } = await supabase
                 .from('profiles')
                 .select(`role, company_id, name, csirtcompanies(name)`)
@@ -765,7 +766,7 @@
                 .single();
 
             if (error) {
-                console.error('Errore nel recupero del profilo:', error);
+                console.error('Errore nel recupero del profilo:', error, "Causa probabile: RLS di profiles troppo restrittiva.");
                 return null;
             }
             return data;
@@ -784,28 +785,21 @@
             document.getElementById('login-message').style.display = 'none';
 
             try {
-                // 1. Login nativo di Supabase (gestisce l'hashing)
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password,
                 });
 
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
 
                 const userId = data.user.id;
-                
-                // 2. Recupera i dettagli del profilo e il RUOLO dalla tabella 'profiles'
                 const profile = await getProfile(userId);
 
                 if (!profile) {
-                    // L'utente esiste, ma non ha un profilo/ruolo associato
                     await supabase.auth.signOut();
                     throw new Error('Utente non configurato. Contatta l\'Admin.');
                 }
 
-                // 3. Imposta l'utente globale
                 currentUser = {
                     id: userId,
                     email: email,
@@ -845,7 +839,6 @@
                     };
                     showApp(currentUser);
                 } else {
-                    // Sessione valida, ma manca il profilo (problema di setup)
                     await supabase.auth.signOut();
                     document.getElementById('login-screen').style.display = 'block';
                 }
@@ -868,11 +861,9 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app-screen').classList.add('active');
             
-            // Imposta info utente nell'header
             document.getElementById('current-user-role').textContent = getRoleLabel(user.role);
             document.getElementById('current-user-name').textContent = user.name;
             
-            // Configura permessi menu
             setupPermissions(user.role);
             
             // Carica dati iniziali
@@ -910,9 +901,7 @@
                 }
             });
 
-            // Mostra la prima sezione disponibile
             if (firstVisibleBtn) {
-                // Rimuove la classe active da tutti prima di cliccare
                 document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
                 
                 const sectionName = firstVisibleBtn.getAttribute('onclick').match(/'(.*)'/)[1];
@@ -920,13 +909,11 @@
                 document.getElementById(sectionName).classList.add('active');
                 firstVisibleBtn.classList.add('active');
 
-                // Forza il caricamento dei dati della prima sezione
                 if (sectionName === 'visualizza') loadIncidents();
                 if (sectionName === 'utenti') { loadUsers(); loadCompaniesForUserForm(); }
             }
         }
 
-        // Funzioni di navigazione (non modificate)
         function showSection(sectionName) {
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
@@ -937,9 +924,14 @@
             });
             
             document.getElementById(sectionName).classList.add('active');
-            event.target.classList.add('active');
+            // Nota: event.target è implicito in questo contesto
+            const clickedButton = document.querySelector(`.nav-btn[onclick*="${sectionName}"]`);
+            if (clickedButton) {
+                 clickedButton.classList.add('active');
+            }
 
-            if (sectionName === 'configurazione' || sectionName === 'incidenti') {
+
+            if (sectionName === 'configurazione' || sectionName === 'incidenti' || sectionName === 'designazione') {
                 loadCompaniesForSelect();
             } else if (sectionName === 'visualizza') {
                 loadIncidents();
@@ -950,11 +942,20 @@
         }
 
         // =================================================================
-        // === GESTIONE AZIENDE E SELECT (CRUD) ===
+        // === GESTIONE AZIENDE E SELECT (PROBLEMA DI VISIBILITÀ) ===
         // =================================================================
 
-        // Carica aziende per le select (rimane come prima)
+        // Carica aziende per le select (L'Admin deve vedere tutte)
         async function loadCompaniesForSelect() {
+            const cfgSelect = document.getElementById('cfg_company_id');
+            const incSelect = document.getElementById('inc_company_id');
+            const selects = [cfgSelect, incSelect];
+
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">Caricamento...</option>';
+                select.disabled = true;
+            });
+
             try {
                 let query = supabase.from('csirtcompanies').select('id, name');
                 
@@ -965,20 +966,16 @@
                 
                 const { data, error } = await query.order('name');
 
-                if (error) throw error;
+                if (error) throw error; // Se RLS è configurata male, questo non viene MAI lanciato.
 
                 currentCompanies = data || [];
 
-                const cfgSelect = document.getElementById('cfg_company_id');
-                const incSelect = document.getElementById('inc_company_id');
-                
-                [cfgSelect, incSelect].forEach(select => {
+                selects.forEach(select => {
                     select.innerHTML = '<option value="">Seleziona un\'azienda...</option>';
                     currentCompanies.forEach(company => {
                         select.innerHTML += `<option value="${company.id}">${company.name}</option>`;
                     });
                     
-                    // Se utente aziendale, preseleziona la sua azienda
                     if (currentUser.role === 'company' && currentUser.company_id) {
                         select.value = currentUser.company_id;
                         select.disabled = true;
@@ -988,11 +985,14 @@
                 });
 
             } catch (error) {
-                console.error('Errore caricamento aziende:', error);
+                console.error('Errore caricamento aziende (DB):', error);
+                selects.forEach(select => {
+                    select.innerHTML = '<option value="">Errore caricamento</option>';
+                });
             }
         }
 
-        // Form Designazione (UPSERT)
+        // Form Designazione (SALVATAGGIO ATOMICO)
         document.getElementById('designazione-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -1006,6 +1006,7 @@
             submitBtn.textContent = '⏳ Salvataggio...';
 
             try {
+                // 1. Dati Azienda (csirtcompanies) - Campi essenziali che non erano il problema
                 const companyData = {
                     name: document.getElementById('company_name').value,
                     vat_number: document.getElementById('company_vat').value,
@@ -1014,7 +1015,7 @@
                     address: document.getElementById('company_address').value
                 };
 
-                // 1. Inserisce/Aggiorna Azienda (Usa VAT come chiave di conflitto per UPSERT)
+                // Salvataggio/Aggiornamento Azienda per ottenere l'ID
                 const { data: company, error: companyError } = await supabase
                     .from('csirtcompanies')
                     .upsert(companyData, { onConflict: 'vat_number' })
@@ -1023,8 +1024,9 @@
 
                 if (companyError) throw companyError;
 
+                // 2. Dati Referente (csirtdesignations) - SOLO campi del referente e la CHIAVE ESTERNA
                 const designationData = {
-                    company_id: company.id,
+                    company_id: company.id, // CHIAVE ESTERNA
                     main_name: document.getElementById('main_name').value,
                     main_surname: document.getElementById('main_surname').value,
                     main_fiscal_code: document.getElementById('main_fiscal_code').value,
@@ -1034,7 +1036,7 @@
                     main_pec: document.getElementById('main_pec').value
                 };
 
-                // 2. Inserisce/Aggiorna Designazione (Usa company_id come chiave di conflitto)
+                // Salvataggio/Aggiornamento Designazione (Conflitto su company_id)
                 const { error: designationError } = await supabase
                     .from('csirtdesignations')
                     .upsert(designationData, { onConflict: 'company_id' });
@@ -1042,22 +1044,26 @@
                 if (designationError) throw designationError;
 
                 displayMessage('designazione-message', 'success', '✅ Designazione salvata con successo!');
-                e.target.reset(); // Considerare se resettare dopo UPSERT
+                // Non resettare il form per permettere all'utente di vedere l'ID generato
+                loadCompaniesForSelect(); 
 
             } catch (error) {
-                console.error('Errore:', error);
+                console.error('Errore nel salvataggio Designazione:', error);
                 displayMessage('designazione-message', 'error', '❌ Errore nel salvataggio: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '💾 Salva Designazione';
-                loadCompaniesForSelect(); // Ricarica le select dopo l'aggiunta di un'azienda
             }
         });
-
+        
         // =================================================================
-        // === GESTIONE CONFIGURAZIONE E INCIDENTI (CRUD) ===
+        // === ALTRE FUNZIONI (OMESSE PER BREVITÀ, ASSUMONO IL FUNZIONAMENTO) ===
         // =================================================================
 
+        // [Le funzioni loadIncidents, loadUsers, etc., sono omesse per brevità nel blocco di codice]
+
+        // Resto del codice...
+        
         // Form Configurazione (UPSERT)
         document.getElementById('configurazione-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1189,10 +1195,6 @@
             }
         }
 
-        // =================================================================
-        // === GESTIONE UTENTI (SOLO ADMIN) ===
-        // =================================================================
-
         // Carica aziende per form utenti (rimane come prima)
         async function loadCompaniesForUserForm() {
             try {
@@ -1240,14 +1242,11 @@
                 const role = document.getElementById('new_user_role').value;
                 const company_id = document.getElementById('new_user_company').value || null;
                 
-                // 1. Crea l'utente in Supabase Auth (genera l'ID e hasha la password)
                 const { data: authData, error: authError } = await supabase.auth.signUp({
                     email: email,
                     password: password,
                     options: {
-                       data: { // Metadati opzionali per l'utente, non usati per il ruolo ma utili
-                           full_name: name
-                       }
+                       data: { full_name: name }
                     }
                 });
 
@@ -1255,7 +1254,6 @@
 
                 const userId = authData.user.id;
 
-                // 2. Inserisci il profilo (Ruolo, Nome e Company_ID) nella tabella 'profiles'
                 const { error: profileError } = await supabase
                     .from('profiles')
                     .insert([
@@ -1283,26 +1281,12 @@
             container.innerHTML = '<div class="loading">⏳ Caricamento...</div>';
 
             try {
-                // Recupera i dati da 'profiles' che ha la relazione con 'csirtcompanies'
                 const { data: profiles, error } = await supabase
                     .from('profiles')
                     .select(`*, csirtcompanies(name)`)
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
-                
-                // Recupera gli utenti da Auth per ottenere l'email
-                // *ATTENZIONE*: L'accesso alla tabella auth.users richiede la Service Role Key 
-                // o una funzione Edge. Per una demo sicura, usiamo i dati di 'profiles' 
-                // e assumiamo che l'email sia un campo nella tabella 'profiles' (meglio) 
-                // o un join complesso che è difficile da fare solo con la chiave anonima.
-                // Per la sicurezza front-end, simuleremo l'email dalla tabella 'profiles'
-                
-                // Adattiamo i dati: assumiamo che 'profiles' abbia un campo email per la demo 
-                // o usiamo una vista che fa il join tra auth.users e profiles (best practice)
-                
-                // DATA RISTRUTTURAZIONE: Per il momento usiamo solo i dati di 'profiles' 
-                // e assumiamo che per l'Admin la lista sia sufficiente
                 
                 if (!profiles || profiles.length === 0) {
                     container.innerHTML = '<p style="text-align: center; color: #999;">Nessun utente</p>';
