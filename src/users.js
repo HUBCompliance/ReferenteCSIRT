@@ -1,6 +1,7 @@
 import { apiRequest } from './api.js';
 import { state } from './state.js';
 import { displayMessage, populateSelect, renderUsers } from './ui.js';
+import { setupFormValidation, validateForm } from './validation.js';
 
 export function bindUserRoleToggle() {
   const roleSelect = document.getElementById('new_user_role');
@@ -22,11 +23,16 @@ export async function loadCompaniesForUserForm() {
 
 export function bindUserForm() {
   const userForm = document.getElementById('utenti-form');
+  setupFormValidation(userForm);
   userForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     if (state.currentUser?.role !== 'admin') {
       displayMessage('utenti-message', 'error', 'Solo gli Admin possono creare utenti');
+      return;
+    }
+
+    if (!validateForm(userForm)) {
       return;
     }
 

@@ -69,12 +69,26 @@ textarea {
   font-family: inherit;
 }
 
+input[aria-invalid='true'],
+select[aria-invalid='true'],
+textarea[aria-invalid='true'] {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
 input:focus,
 select:focus,
 textarea:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.field-error {
+  color: #c1121f;
+  font-size: 13px;
+  margin-top: 6px;
+  min-height: 18px;
 }
 
 textarea {

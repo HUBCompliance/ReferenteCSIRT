@@ -67,15 +67,24 @@ export function setActiveSection(sectionName) {
   });
   document.querySelectorAll('.nav-btn').forEach((btn) => {
     btn.classList.remove('active');
+    btn.setAttribute('aria-pressed', 'false');
+    btn.removeAttribute('aria-current');
   });
 
   const section = document.getElementById(sectionName);
   const button = Array.from(document.querySelectorAll('.nav-btn')).find((btn) => btn.dataset.target === sectionName);
   if (section) {
     section.classList.add('active');
+    const heading = section.querySelector('h2');
+    if (heading) {
+      heading.setAttribute('tabindex', '-1');
+      heading.focus({ preventScroll: true });
+    }
   }
   if (button) {
     button.classList.add('active');
+    button.setAttribute('aria-pressed', 'true');
+    button.setAttribute('aria-current', 'page');
   }
 }
 
