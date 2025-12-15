@@ -25,6 +25,51 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+const ACL = {
+  admin: {
+    csirtcompanies: ['select', 'upsert'],
+    csirtincidents: ['select', 'insert'],
+    csirtnotifications: ['select', 'insert'],
+    csirtnetwork_configuration: ['select', 'upsert'],
+    profiles: ['select', 'insert'],
+  },
+  csirt: {
+    csirtcompanies: ['select', 'upsert'],
+    csirtincidents: ['select', 'insert'],
+    csirtnotifications: ['select', 'insert'],
+    csirtnetwork_configuration: ['select', 'upsert'],
+  },
+  company: {
+    csirtcompanies: ['select'],
+    csirtincidents: ['select', 'insert'],
+    csirtnotifications: ['select', 'insert'],
+    csirtnetwork_configuration: ['select', 'upsert'],
+  },
+};
+
+function ensureAcl(profile, table, operation) {
+  const roleRules = ACL[profile.role] || {};
+  if (!roleRules[table] || !roleRules[table].includes(operation)) {
+    const error = new Error('Permessi insufficienti');
+    error.status = 403;
+    throw error;
+  }
+}
+
+function applyCompanyScope(query, profile, column = 'company_id') {
+  if (profile.role === 'company' && profile.company_id) {
+    return query.eq(column, profile.company_id);
+  }
+  return query;
+}
+
+function resolveCompanyIdForWrite(profile, requestedCompanyId) {
+  if (profile.role === 'company') {
+    return profile.company_id;
+  }
+  return requestedCompanyId || null;
+}
+
 async function fetchProfile(userId) {
   const { data, error } = await supabase
     .from('profiles')
@@ -104,18 +149,18 @@ app.post('/api/auth/logout', async (req, res) => {
 
 app.get('/api/companies', requireAuth, async (req, res) => {
   try {
+    ensureAcl(req.profile, 'csirtcompanies', 'select');
+
     let query = supabase.from('csirtcompanies').select('id, name, vat_number, fiscal_code, sector, address');
 
-    if (req.profile.role === 'company' && req.profile.company_id) {
-      query = query.eq('id', req.profile.company_id);
-    }
+    query = applyCompanyScope(query, req.profile, 'id');
 
     const { data, error } = await query.order('name');
     if (error) throw error;
 
     res.json(data || []);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
@@ -127,6 +172,8 @@ app.post('/api/designations', requireAuth, async (req, res) => {
   const { companyData, designationData } = req.body;
 
   try {
+    ensureAcl(req.profile, 'csirtcompanies', 'upsert');
+
     const { data: company, error: companyError } = await supabase
       .from('csirtcompanies')
       .upsert(companyData, { onConflict: 'vat_number' })
@@ -150,11 +197,14 @@ app.post('/api/designations', requireAuth, async (req, res) => {
 });
 
 app.post('/api/configurations', requireAuth, async (req, res) => {
-  const configData = req.body;
+  ensureAcl(req.profile, 'csirtnetwork_configuration', 'upsert');
 
-  if (req.profile.role === 'company' && req.profile.company_id !== configData.company_id) {
-    return res.status(403).json({ error: 'Non puoi modificare un\'altra azienda' });
+  const company_id = resolveCompanyIdForWrite(req.profile, req.body.company_id);
+  if (!company_id) {
+    return res.status(400).json({ error: 'company_id obbligatorio' });
   }
+
+  const configData = { ...req.body, company_id };
 
   try {
     const { error } = await supabase
@@ -170,11 +220,14 @@ app.post('/api/configurations', requireAuth, async (req, res) => {
 });
 
 app.post('/api/incidents', requireAuth, async (req, res) => {
-  const incidentData = { ...req.body, created_by: req.authUser.id };
+  ensureAcl(req.profile, 'csirtincidents', 'insert');
 
-  if (req.profile.role === 'company' && req.profile.company_id !== incidentData.company_id) {
-    return res.status(403).json({ error: 'Non puoi registrare incidenti per un\'altra azienda' });
+  const company_id = resolveCompanyIdForWrite(req.profile, req.body.company_id);
+  if (!company_id) {
+    return res.status(400).json({ error: 'company_id obbligatorio' });
   }
+
+  const incidentData = { ...req.body, company_id, created_by: req.authUser.id };
 
   try {
     const { error } = await supabase
@@ -191,20 +244,18 @@ app.post('/api/incidents', requireAuth, async (req, res) => {
 
 app.get('/api/incidents', requireAuth, async (req, res) => {
   try {
-    let query = supabase
-      .from('csirtincidents')
-      .select('*, csirtcompanies(name)');
+    ensureAcl(req.profile, 'csirtincidents', 'select');
 
-    if (req.profile.role === 'company' && req.profile.company_id) {
-      query = query.eq('company_id', req.profile.company_id);
-    }
+    let query = supabase.from('csirtincidents').select('*, csirtcompanies(name)');
+
+    query = applyCompanyScope(query, req.profile);
 
     const { data, error } = await query.order('incident_datetime', { ascending: false });
     if (error) throw error;
 
     res.json(data || []);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
@@ -222,52 +273,55 @@ app.use((req, res, next) => {
 });
 
 app.post('/api/notifications', requireAuth, async (req, res) => {
-  const notificationData = req.body;
+  ensureAcl(req.profile, 'csirtnotifications', 'insert');
 
   try {
-    if (req.profile.role === 'company') {
-      const { data: incident, error: incidentError } = await supabase
-        .from('csirtincidents')
-        .select('company_id')
-        .eq('id', notificationData.incident_id)
-        .single();
+    const { data: incident, error: incidentError } = await supabase
+      .from('csirtincidents')
+      .select('company_id')
+      .eq('id', req.body.incident_id)
+      .single();
 
-      if (incidentError) throw incidentError;
-
-      if (incident.company_id !== req.profile.company_id) {
-        return res.status(403).json({ error: 'Non puoi notificare incidenti di altre aziende' });
-      }
+    if (incidentError) throw incidentError;
+    if (!incident) {
+      return res.status(404).json({ error: 'Incidente non trovato' });
     }
+
+    if (req.profile.role === 'company' && incident.company_id !== req.profile.company_id) {
+      return res.status(403).json({ error: 'Non puoi notificare incidenti di altre aziende' });
+    }
+
+    const payload = { ...req.body, company_id: incident.company_id };
 
     const { error } = await supabase
       .from('csirtnotifications')
-      .insert([notificationData]);
+      .insert([payload]);
 
     if (error) throw error;
 
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
 app.get('/api/notifications', requireAuth, async (req, res) => {
   try {
+    ensureAcl(req.profile, 'csirtnotifications', 'select');
+
     let query = supabase
       .from('csirtnotifications')
       .select('*, csirtincidents(title)')
       .order('created_at', { ascending: false });
 
-    if (req.profile.role === 'company' && req.profile.company_id) {
-      query = query.eq('company_id', req.profile.company_id);
-    }
+    query = applyCompanyScope(query, req.profile);
 
     const { data, error } = await query;
     if (error) throw error;
 
     res.json(data || []);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
