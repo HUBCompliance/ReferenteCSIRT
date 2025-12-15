@@ -31,6 +31,7 @@ async function pingBackend() {
       'login-message',
       'error',
       `${error.message} Se stai usando Supabase, conferma che l'API sia raggiungibile e che il file SUPABASE_SETUP.md sia stato seguito.`,
+      { persist: true },
     );
   }
 }
@@ -58,7 +59,12 @@ async function handleLogin(event, onAuthenticated) {
     onAuthenticated();
   } catch (error) {
     console.error('Errore login:', error);
-    displayMessage('login-message', 'error', error.message || 'Credenziali non valide');
+    displayMessage(
+      'login-message',
+      'error',
+      `${error.message || 'Credenziali non valide'}\n\nSuggerimenti rapidi: verifica che il server Node sia avviato con "npm start" e che il file .env contenga SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY corretti.`,
+      { persist: true },
+    );
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = '🔐 Accedi';
