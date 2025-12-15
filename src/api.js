@@ -30,6 +30,23 @@ export function clearSessionTokens() {
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
+export async function checkBackendHealth() {
+  try {
+    const response = await fetch(`${API_BASE}/health`);
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.details || `Backend non disponibile (HTTP ${response.status})`);
+    }
+    return response.json();
+  } catch (error) {
+    const reason = error?.message ? ` Dettaglio: ${error.message}` : '';
+    throw new Error(
+      `Backend non raggiungibile. Avvia il server Node (npm start), verifica il proxy /api e le variabili Supabase nel file .env.${reason}`,
+      { cause: error },
+    );
+  }
+}
+
 export async function apiRequest(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   const token = getAccessToken();
@@ -37,8 +54,20 @@ export async function apiRequest(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
-  const payload = await response.json().catch(() => ({}));
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  } catch (networkError) {
+    throw new Error('Impossibile contattare il server. Controlla la connessione o che il proxy backend sia attivo.');
+  }
+
+  const rawBody = await response.text();
+  let payload = {};
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : {};
+  } catch (_parseError) {
+    payload = {};
+  }
 
   if (response.status === 401) {
     if (unauthorizedHandler) {
@@ -48,7 +77,13 @@ export async function apiRequest(path, options = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(payload.error || 'Errore di rete');
+    const statusLabel = response.status ? ` (HTTP ${response.status})` : '';
+    const fallback =
+      response.status === 404
+        ? 'Endpoint /api non trovato. Avvia il server backend con "npm start" (non usare solo "npm run dev").'
+        : 'Errore di rete';
+    const details = payload.error || payload.message || payload.details || rawBody || fallback;
+    throw new Error(`${details}${statusLabel}`);
   }
 
   return payload;

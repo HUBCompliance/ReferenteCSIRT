@@ -1,13 +1,17 @@
 import { state } from './state.js';
 
-export function displayMessage(divId, type, content) {
+export function displayMessage(divId, type, content, options = {}) {
+  const { persist = false } = options;
   const messageDiv = document.getElementById(divId);
   messageDiv.className = `message ${type}`;
   messageDiv.textContent = content;
   messageDiv.style.display = 'block';
-  setTimeout(() => {
-    messageDiv.style.display = 'none';
-  }, 5000);
+
+  if (!persist) {
+    setTimeout(() => {
+      messageDiv.style.display = 'none';
+    }, 5000);
+  }
 }
 
 export function toggleScreens(showApp) {
