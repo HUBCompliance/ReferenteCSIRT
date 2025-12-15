@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const fs = require('fs');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
 dotenv.config();
@@ -8,7 +10,12 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.'));
+
+const distPath = path.join(__dirname, 'dist');
+const publicPath = __dirname;
+
+app.use(express.static(distPath));
+app.use(express.static(publicPath));
 
 const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
 
@@ -199,6 +206,19 @@ app.get('/api/incidents', requireAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+
+  const distIndex = path.join(distPath, 'index.html');
+  if (fs.existsSync(distIndex)) {
+    return res.sendFile(distIndex);
+  }
+
+  return res.sendFile(path.join(publicPath, 'index.html'));
 });
 
 app.post('/api/notifications', requireAuth, async (req, res) => {
