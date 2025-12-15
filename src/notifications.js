@@ -1,11 +1,17 @@
 import { apiRequest } from './api.js';
 import { state } from './state.js';
 import { displayMessage, renderNotifications } from './ui.js';
+import { setupFormValidation, validateForm } from './validation.js';
 
 export function bindNotificationForm() {
   const form = document.getElementById('notifiche-form');
+  setupFormValidation(form);
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    if (!validateForm(form)) {
+      return;
+    }
 
     const submitBtn = e.target.querySelector('.submit-btn');
     submitBtn.disabled = true;

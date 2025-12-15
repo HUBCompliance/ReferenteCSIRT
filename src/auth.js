@@ -1,9 +1,11 @@
 import { apiRequest, clearSessionTokens, getAccessToken, getRefreshToken, setUnauthorizedHandler, storeSessionTokens } from './api.js';
 import { state } from './state.js';
 import { applyNavigationPermissions, displayMessage, setActiveSection, toggleScreens, updateUserHeader } from './ui.js';
+import { setupFormValidation, validateForm } from './validation.js';
 
 export function initAuth(onAuthenticated) {
   const loginForm = document.getElementById('login-form');
+  setupFormValidation(loginForm);
   loginForm.addEventListener('submit', (e) => handleLogin(e, onAuthenticated));
   document.getElementById('logout-btn').addEventListener('click', () => logout());
   setUnauthorizedHandler(() => logout(true));
@@ -12,6 +14,9 @@ export function initAuth(onAuthenticated) {
 
 async function handleLogin(event, onAuthenticated) {
   event.preventDefault();
+  if (!validateForm(event.target)) {
+    return;
+  }
   const email = document.getElementById('login-email').value;
   const password = document.getElementById('login-password').value;
   const submitBtn = event.target.querySelector('.submit-btn');

@@ -7,6 +7,7 @@ import {
   resetSelect,
   syncCompanyVisibility,
 } from './ui.js';
+import { setupFormValidation, validateForm } from './validation.js';
 
 export async function loadCompaniesForSelect() {
   const cfgSelect = document.getElementById('cfg_company_id');
@@ -65,8 +66,13 @@ export async function loadIncidentsForSelect() {
 
 export function bindIncidentForm() {
   const incidentForm = document.getElementById('incidenti-form');
+  setupFormValidation(incidentForm);
   incidentForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    if (!validateForm(incidentForm)) {
+      return;
+    }
 
     const submitBtn = e.target.querySelector('.submit-btn');
     submitBtn.disabled = true;
@@ -102,11 +108,16 @@ export function bindIncidentForm() {
 
 export async function bindDesignationForm() {
   const designationForm = document.getElementById('designazione-form');
+  setupFormValidation(designationForm);
   designationForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     if (!['admin', 'csirt'].includes(state.currentUser?.role)) {
       displayMessage('designazione-message', 'error', 'Non hai i permessi per questa operazione');
+      return;
+    }
+
+    if (!validateForm(designationForm)) {
       return;
     }
 
@@ -162,8 +173,13 @@ export async function bindDesignationForm() {
 
 export function bindConfigurationForm() {
   const configForm = document.getElementById('configurazione-form');
+  setupFormValidation(configForm);
   configForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    if (!validateForm(configForm)) {
+      return;
+    }
 
     const submitBtn = e.target.querySelector('.submit-btn');
     submitBtn.disabled = true;
