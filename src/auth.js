@@ -1,4 +1,12 @@
-import { apiRequest, clearSessionTokens, getAccessToken, getRefreshToken, setUnauthorizedHandler, storeSessionTokens } from './api.js';
+import {
+  apiRequest,
+  checkBackendHealth,
+  clearSessionTokens,
+  getAccessToken,
+  getRefreshToken,
+  setUnauthorizedHandler,
+  storeSessionTokens,
+} from './api.js';
 import { state } from './state.js';
 import { applyNavigationPermissions, displayMessage, setActiveSection, toggleScreens, updateUserHeader } from './ui.js';
 import { setupFormValidation, validateForm } from './validation.js';
@@ -9,7 +17,22 @@ export function initAuth(onAuthenticated) {
   loginForm.addEventListener('submit', (e) => handleLogin(e, onAuthenticated));
   document.getElementById('logout-btn').addEventListener('click', () => logout());
   setUnauthorizedHandler(() => logout(true));
+  pingBackend();
   checkSession(onAuthenticated);
+}
+
+async function pingBackend() {
+  const banner = document.getElementById('login-message');
+  try {
+    await checkBackendHealth();
+    banner.style.display = 'none';
+  } catch (error) {
+    displayMessage(
+      'login-message',
+      'error',
+      `${error.message} Se stai usando Supabase, conferma che l'API sia raggiungibile e che il file SUPABASE_SETUP.md sia stato seguito.`,
+    );
+  }
 }
 
 async function handleLogin(event, onAuthenticated) {

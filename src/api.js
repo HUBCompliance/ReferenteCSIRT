@@ -30,6 +30,22 @@ export function clearSessionTokens() {
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
 
+export async function checkBackendHealth() {
+  try {
+    const response = await fetch(`${API_BASE}/health`);
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}));
+      throw new Error(payload.details || `Backend non disponibile (HTTP ${response.status})`);
+    }
+    return response.json();
+  } catch (error) {
+    throw new Error(
+      'Backend non raggiungibile. Avvia il server Node (npm start) e verifica le variabili Supabase nel file .env.',
+      { cause: error },
+    );
+  }
+}
+
 export async function apiRequest(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   const token = getAccessToken();
