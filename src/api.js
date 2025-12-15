@@ -42,6 +42,8 @@ export async function checkBackendHealth() {
     const reason = error?.message ? ` Dettaglio: ${error.message}` : '';
     throw new Error(
       `Backend non raggiungibile. Avvia il server Node (npm start), verifica il proxy /api e le variabili Supabase nel file .env.${reason}`,
+    throw new Error(
+      'Backend non raggiungibile. Avvia il server Node (npm start) e verifica le variabili Supabase nel file .env.',
       { cause: error },
     );
   }
@@ -68,6 +70,7 @@ export async function apiRequest(path, options = {}) {
   } catch (_parseError) {
     payload = {};
   }
+  const payload = await response.json().catch(() => ({}));
 
   if (response.status === 401) {
     if (unauthorizedHandler) {
