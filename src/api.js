@@ -37,7 +37,13 @@ export async function apiRequest(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  } catch (networkError) {
+    throw new Error('Impossibile contattare il server. Controlla la connessione o che il proxy backend sia attivo.');
+  }
+
   const payload = await response.json().catch(() => ({}));
 
   if (response.status === 401) {
