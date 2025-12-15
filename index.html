@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSIRT Management Platform</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
         * {
             margin: 0;
@@ -830,24 +829,16 @@
    </div>
   </div>
   <script>
-        // =================================================================
-        // === CONFIGURAZIONE SUPABASE - INSERIRE LE PROPRIE CHIAVI QUI ===
-        // =================================================================
-        // **UTILIZZARE SOLO LA CHIAVE ANONIMA PUBBLICA (anon key)**
-        const SUPABASE_URL = 'https://gkoqpayaddyzmgfnripx.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdrb3FwYXlhZGR5em1nZm5yaXB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNTU4NzUsImV4cCI6MjA3OTgzMTg3NX0.4fYTxWxxxcbMzdP7-Xu2SGfv0TEqFk67G7pJ6K-8ayg'; 
+        const API_BASE = '/api';
+        const ACCESS_TOKEN_KEY = 'referente_csirt_access_token';
+        const REFRESH_TOKEN_KEY = 'referente_csirt_refresh_token';
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Variabili globali
         let currentUser = null;
         let currentCompanies = [];
-        let currentIncidents = []; // Aggiunto per le notifiche
+        let currentIncidents = [];
 
-        // Esegui il controllo della sessione all'avvio
         document.addEventListener('DOMContentLoaded', checkSession);
 
-        // Funzione di utility per mostrare messaggi
         function displayMessage(divId, type, content) {
             const messageDiv = document.getElementById(divId);
             messageDiv.className = `message ${type}`;
@@ -858,121 +849,90 @@
             }, 5000);
         }
 
-        // Funzione per ottenere i dettagli del profilo, incluso il RUOLO
-        async function getProfile(userId) {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select(`role, company_id, name, csirtcompanies(name)`)
-                .eq('id', userId)
-                .single();
-
-            if (error) {
-                console.error('Errore nel recupero del profilo:', error);
-                return null;
+        async function apiRequest(path, options = {}) {
+            const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+            const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
             }
-            return data;
+
+            const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+            const payload = await response.json().catch(() => ({}));
+
+            if (response.status === 401) {
+                await logout();
+                throw new Error('Sessione scaduta, effettua di nuovo il login');
+            }
+
+            if (!response.ok) {
+                throw new Error(payload.error || 'Errore di rete');
+            }
+
+            return payload;
         }
 
-        // Funzione per il Login Sicuro (Supabase Auth)
+        function persistSession({ access_token, refresh_token, user, profile }) {
+            if (access_token) localStorage.setItem(ACCESS_TOKEN_KEY, access_token);
+            if (refresh_token) localStorage.setItem(REFRESH_TOKEN_KEY, refresh_token);
+
+            currentUser = {
+                id: user.id,
+                email: user.email,
+                name: profile.name,
+                role: profile.role,
+                company_id: profile.company_id,
+                company_name: profile.company_name,
+            };
+        }
+
+        async function checkSession() {
+            const existingToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+            if (!existingToken) return;
+
+            try {
+                const session = await apiRequest('/auth/session');
+                persistSession({
+                    access_token: existingToken,
+                    refresh_token: localStorage.getItem(REFRESH_TOKEN_KEY),
+                    user: session.user,
+                    profile: session.profile,
+                });
+                showApp(currentUser);
+            } catch (error) {
+                console.warn('Sessione non valida:', error);
+                await logout(true);
+            }
+        }
+
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const submitBtn = e.target.querySelector('.submit-btn');
-            
+
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Accesso in corso...';
             document.getElementById('login-message').style.display = 'none';
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
+                const data = await apiRequest('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password }),
                 });
 
-                if (error) throw error;
-
-                const userId = data.user.id;
-                const profile = await getProfile(userId);
-
-                if (!profile) {
-                    await supabase.auth.signOut();
-                    throw new Error('Utente non configurato. Contatta l\'Admin.');
-                }
-
-                currentUser = {
-                    id: userId,
-                    email: email,
-                    name: profile.name,
-                    role: profile.role,
-                    company_id: profile.company_id,
-                    company_name: profile.csirtcompanies?.name,
-                };
-                
+                persistSession(data);
                 showApp(currentUser);
-
             } catch (error) {
                 console.error('Errore login:', error);
-                displayMessage('login-message', 'error', '❌ Credenziali non valide o utente non configurato.');
+                displayMessage('login-message', 'error', error.message || 'Credenziali non valide');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = '🔐 Accedi';
             }
         });
-        
-        // Verifica sessione all'avvio
-        async function checkSession() {
-            const { data: { session }, error } = await supabase.auth.getSession();
 
-            if (session) {
-                const userId = session.user.id;
-                const profile = await getProfile(userId);
-
-                if (profile) {
-                    currentUser = {
-                        id: userId,
-                        email: session.user.email,
-                        name: profile.name,
-                        role: profile.role,
-                        company_id: profile.company_id,
-                        company_name: profile.csirtcompanies?.name,
-                    };
-                    showApp(currentUser);
-                } else {
-                    await supabase.auth.signOut();
-                    document.getElementById('login-screen').style.display = 'block';
-                }
-            } else {
-                document.getElementById('login-screen').style.display = 'block';
-            }
-        }
-
-        // Logout
-        async function logout() {
-            await supabase.auth.signOut();
-            currentUser = null;
-            document.getElementById('login-screen').style.display = 'block';
-            document.getElementById('app-screen').classList.remove('active');
-            document.getElementById('login-form').reset();
-        }
-
-        // Visualizza app principale
-        function showApp(user) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-screen').classList.add('active');
-            
-            document.getElementById('current-user-role').textContent = getRoleLabel(user.role);
-            document.getElementById('current-user-name').textContent = user.name;
-            
-            setupPermissions(user.role);
-            
-            // Carica dati iniziali
-            loadCompaniesForSelect();
-        }
-
-        // Ottieni label ruolo
-        function getRoleLabel(role) {
+        function translateRole(role) {
             const labels = {
                 'admin': '👑 Amministratore',
                 'csirt': '🛡️ Referente CSIRT',
@@ -981,7 +941,42 @@
             return labels[role] || role;
         }
 
-        // Setup permessi menu
+        function showApp(user) {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+
+            document.getElementById('welcome-text').textContent = `Benvenuto, ${user.name}!`;
+            document.getElementById('role-text').textContent = `Ruolo: ${translateRole(user.role)}${user.company_name ? ' - ' + user.company_name : ''}`;
+
+            setupPermissions(user.role);
+        }
+
+        async function logout(silent = false) {
+            const refresh_token = localStorage.getItem(REFRESH_TOKEN_KEY);
+            localStorage.removeItem(ACCESS_TOKEN_KEY);
+            localStorage.removeItem(REFRESH_TOKEN_KEY);
+            currentUser = null;
+
+            if (refresh_token) {
+                try {
+                    await apiRequest('/auth/logout', {
+                        method: 'POST',
+                        body: JSON.stringify({ refresh_token }),
+                    });
+                } catch (error) {
+                    console.warn('Errore durante il logout:', error);
+                }
+            }
+
+            document.getElementById('app-container').style.display = 'none';
+            document.getElementById('login-section').style.display = 'block';
+            if (!silent) {
+                displayMessage('login-message', 'success', 'Logout effettuato con successo');
+            }
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', () => logout());
+
         function setupPermissions(userRole) {
             const navButtons = document.querySelectorAll('.nav-btn');
             let firstVisibleBtn = null;
@@ -991,7 +986,7 @@
                 if (!permissions) return;
 
                 const allowedRoles = permissions.split(',');
-                
+
                 if (allowedRoles.includes(userRole)) {
                     btn.disabled = false;
                     btn.style.display = '';
@@ -1004,7 +999,7 @@
 
             if (firstVisibleBtn) {
                 document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-                
+
                 const sectionName = firstVisibleBtn.getAttribute('onclick').match(/'(.*)'/)[1];
                 document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
                 document.getElementById(sectionName).classList.add('active');
@@ -1019,11 +1014,11 @@
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
-            
+
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
+
             document.getElementById(sectionName).classList.add('active');
             const clickedButton = document.querySelector(`.nav-btn[onclick*="${sectionName}"]`);
             if (clickedButton) {
@@ -1035,20 +1030,15 @@
                 loadCompaniesForSelect();
             } else if (sectionName === 'visualizza') {
                 loadIncidents();
-            } else if (sectionName === 'notifiche') { 
-                loadIncidentsForSelect(); // Carica gli incidenti per la select
-                loadNotifications(); // Carica le notifiche esistenti
+            } else if (sectionName === 'notifiche') {
+                loadIncidentsForSelect();
+                loadNotifications();
             } else if (sectionName === 'utenti') {
                 loadUsers();
                 loadCompaniesForUserForm();
             }
         }
 
-        // =================================================================
-        // === GESTIONE AZIENDE E SELECT ===
-        // =================================================================
-
-        // Carica aziende per le select (L'Admin deve vedere tutte)
         async function loadCompaniesForSelect() {
             const cfgSelect = document.getElementById('cfg_company_id');
             const incSelect = document.getElementById('inc_company_id');
@@ -1060,24 +1050,15 @@
             });
 
             try {
-                let query = supabase.from('csirtcompanies').select('id, name');
-                
-                if (currentUser.role === 'company' && currentUser.company_id) {
-                    query = query.eq('id', currentUser.company_id);
-                }
-                
-                const { data, error } = await query.order('name');
-
-                if (error) throw error; 
-
+                const data = await apiRequest('/companies');
                 currentCompanies = data || [];
 
                 selects.forEach(select => {
-                    select.innerHTML = '<option value="">Seleziona un\'azienda...</option>';
+                    select.innerHTML = '<option value="">Seleziona un'azienda...</option>';
                     currentCompanies.forEach(company => {
                         select.innerHTML += `<option value="${company.id}">${company.name}</option>`;
                     });
-                    
+
                     if (currentUser.role === 'company' && currentUser.company_id) {
                         select.value = currentUser.company_id;
                         select.disabled = true;
@@ -1087,17 +1068,16 @@
                 });
 
             } catch (error) {
-                console.error('Errore caricamento aziende (DB):', error);
+                console.error('Errore caricamento aziende (API):', error);
                 selects.forEach(select => {
-                    select.innerHTML = '<option value="">Errore RLS/Caricamento</option>';
+                    select.innerHTML = '<option value="">Errore caricamento</option>';
                 });
             }
         }
 
-        // Form Designazione (SALVATAGGIO ATOMICO E COMPLETO)
         document.getElementById('designazione-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             if (!['admin', 'csirt'].includes(currentUser.role)) {
                 displayMessage('designazione-message', 'error', 'Non hai i permessi per questa operazione');
                 return;
@@ -1108,7 +1088,6 @@
             submitBtn.textContent = '⏳ Salvataggio...';
 
             try {
-                // 1. Dati Azienda (csirtcompanies)
                 const companyData = {
                     name: document.getElementById('company_name').value,
                     vat_number: document.getElementById('company_vat').value,
@@ -1117,18 +1096,7 @@
                     address: document.getElementById('company_address').value
                 };
 
-                // Salvataggio/Aggiornamento Azienda per ottenere l'ID
-                const { data: company, error: companyError } = await supabase
-                    .from('csirtcompanies')
-                    .upsert(companyData, { onConflict: 'vat_number' })
-                    .select()
-                    .single();
-
-                if (companyError) throw companyError;
-
-                // 2. Dati Referente (csirtdesignations) - NUOVO SCHEMA ESTESO
                 const designationData = {
-                    company_id: company.id, 
                     data_nomina: document.getElementById('data_nomina').value,
                     main_role: document.getElementById('main_role').value,
                     main_name: document.getElementById('main_name').value,
@@ -1148,15 +1116,13 @@
                     motivation_notes: document.getElementById('motivation_notes').value || null
                 };
 
-                // Salvataggio/Aggiornamento Designazione (Conflitto su company_id)
-                const { error: designationError } = await supabase
-                    .from('csirtdesignations')
-                    .upsert(designationData, { onConflict: 'company_id' });
-
-                if (designationError) throw designationError;
+                await apiRequest('/designations', {
+                    method: 'POST',
+                    body: JSON.stringify({ companyData, designationData })
+                });
 
                 displayMessage('designazione-message', 'success', '✅ Designazione salvata con successo!');
-                loadCompaniesForSelect(); 
+                loadCompaniesForSelect();
 
             } catch (error) {
                 console.error('Errore nel salvataggio Designazione:', error);
@@ -1166,15 +1132,10 @@
                 submitBtn.textContent = '💾 Salva Designazione';
             }
         });
-        
-        // =================================================================
-        // === GESTIONE CONFIGURAZIONE ===
-        // =================================================================
 
-        // Form Configurazione (UPSERT)
         document.getElementById('configurazione-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const submitBtn = e.target.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Salvataggio...';
@@ -1189,11 +1150,10 @@
                     firewall_model: document.getElementById('firewall_model').value
                 };
 
-                const { error } = await supabase
-                    .from('csirtnetwork_configuration')
-                    .upsert(configData, { onConflict: 'company_id' });
-
-                if (error) throw error;
+                await apiRequest('/configurations', {
+                    method: 'POST',
+                    body: JSON.stringify(configData)
+                });
 
                 displayMessage('configurazione-message', 'success', '✅ Configurazione salvata!');
                 e.target.reset();
@@ -1207,40 +1167,28 @@
             }
         });
 
-        // =================================================================
-        // === GESTIONE INCIDENTI ===
-        // =================================================================
-
-        // Form Incidenti (INSERT)
         document.getElementById('incidenti-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const submitBtn = e.target.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Salvataggio...';
 
             try {
-                const incidentId = document.getElementById('inc_company_id').value;
-                
-                // Nota: RLS INSERT su csirtincidents richiede che l'ID azienda sia quello dell'utente loggato se non Admin/CSIRT
-                // Il controllo è fatto tramite la Policy RLS
-                
                 const incidentData = {
-                    company_id: incidentId,
+                    company_id: document.getElementById('inc_company_id').value,
                     title: document.getElementById('inc_title').value,
                     incident_datetime: document.getElementById('inc_datetime').value,
                     severity: document.getElementById('inc_severity').value,
                     status: document.getElementById('inc_status').value,
                     incident_type: document.getElementById('inc_type').value,
-                    description: document.getElementById('inc_description').value,
-                    created_by: currentUser.id 
+                    description: document.getElementById('inc_description').value
                 };
 
-                const { error } = await supabase
-                    .from('csirtincidents')
-                    .insert([incidentData]);
-
-                if (error) throw error;
+                await apiRequest('/incidents', {
+                    method: 'POST',
+                    body: JSON.stringify(incidentData)
+                });
 
                 displayMessage('incidenti-message', 'success', '✅ Incidente salvato!');
                 e.target.reset();
@@ -1254,23 +1202,12 @@
             }
         });
 
-        // Carica incidenti (con JOIN e filtro per ruolo)
         async function loadIncidents() {
             const container = document.getElementById('incidents-container');
             container.innerHTML = '<div class="loading">⏳ Caricamento...</div>';
 
             try {
-                let query = supabase
-                    .from('csirtincidents')
-                    .select(`*, csirtcompanies(name)`);
-                
-                if (currentUser.role === 'company' && currentUser.company_id) {
-                    query = query.eq('company_id', currentUser.company_id);
-                }
-                
-                const { data, error } = await query.order('incident_datetime', { ascending: false });
-
-                if (error) throw error;
+                const data = await apiRequest('/incidents');
 
                 if (!data || data.length === 0) {
                     container.innerHTML = `
@@ -1288,7 +1225,7 @@
                             <div>
                                 <h3 class="incident-title">${incident.title}</h3>
                                 <p style="color: #666; margin-top: 5px;">
-                                    ${incident.csirtcompanies?.name || 'N/A'} • 
+                                    ${incident.csirtcompanies?.name || 'N/A'} •
                                     ${new Date(incident.incident_datetime).toLocaleString('it-IT')}
                                 </p>
                             </div>
@@ -1310,48 +1247,32 @@
             }
         }
 
-        // =================================================================
-        // === GESTIONE NOTIFICHE (NUOVA SEZIONE) ===
-        // =================================================================
-
-        // Carica incidenti per la Select delle Notifiche
         async function loadIncidentsForSelect() {
             const select = document.getElementById('notif_incident_id');
             select.innerHTML = '<option value="">Caricamento...</option>';
-            
-            try {
-                let query = supabase.from('csirtincidents').select('id, title, incident_datetime, company_id');
-                
-                if (currentUser.role === 'company' && currentUser.company_id) {
-                    query = query.eq('company_id', currentUser.company_id);
-                }
-                
-                const { data, error } = await query.order('incident_datetime', { ascending: false });
 
-                if (error) throw error;
-                
+            try {
+                const data = await apiRequest('/incidents');
+
                 currentIncidents = data || [];
                 select.innerHTML = '<option value="">Seleziona un incidente...</option>';
-                
+
                 currentIncidents.forEach(incident => {
                     select.innerHTML += `<option value="${incident.id}">${incident.title} (${new Date(incident.incident_datetime).toLocaleDateString('it-IT')})</option>`;
                 });
-                
+
             } catch (error) {
                 console.error('Errore caricamento incidenti per select:', error);
                 select.innerHTML = '<option value="">Errore caricamento incidenti</option>';
             }
         }
 
-        // Pre-popola i campi in base all'incidente selezionato
         document.getElementById('notif_incident_id').addEventListener('change', function() {
             const selectedId = this.value;
             const incident = currentIncidents.find(i => i.id === selectedId);
-            
+
             if (incident) {
                 document.getElementById('notif_notification_title').value = incident.title;
-                // Formatta la data per l'input datetime-local (taglia i secondi e la Z)
-                const formattedDate = incident.incident_datetime.substring(0, 19).replace('T', ' ');
                 document.getElementById('notif_datetime').value = incident.incident_datetime.substring(0, 16);
             } else {
                 document.getElementById('notif_notification_title').value = '';
@@ -1359,10 +1280,9 @@
             }
         });
 
-        // Form Notifiche (INSERT)
         document.getElementById('notifiche-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const submitBtn = e.target.querySelector('.submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = '⏳ Invio Notifica...';
@@ -1370,32 +1290,31 @@
             try {
                 const incidentId = document.getElementById('notif_incident_id').value;
                 const incident = currentIncidents.find(i => i.id === incidentId);
-                
+
                 if (!incident) {
                     throw new Error("Seleziona un incidente valido.");
                 }
-                
+
                 const notificationData = {
                     incident_id: incidentId,
-                    company_id: incident.company_id, // Preso dall'incidente per RLS e coerenza
+                    company_id: incident.company_id,
                     notification_title: document.getElementById('notif_notification_title').value,
-                    notification_datetime: incident.incident_datetime, // Usiamo la data originale dell'incidente
+                    notification_datetime: incident.incident_datetime,
                     impact_notes: document.getElementById('notif_impact_notes').value,
                     status: document.getElementById('notif_status').value,
                     risk_damage_notes: document.getElementById('notif_risk_damage_notes').value,
                     corrective_actions_notes: document.getElementById('notif_corrective_actions_notes').value,
                 };
 
-                const { error } = await supabase
-                    .from('csirtnotifications')
-                    .insert([notificationData]);
-
-                if (error) throw error;
+                await apiRequest('/notifications', {
+                    method: 'POST',
+                    body: JSON.stringify(notificationData)
+                });
 
                 displayMessage('notifiche-message', 'success', '✅ Notifica salvata e inviata!');
                 e.target.reset();
-                loadNotifications(); // Aggiorna la lista
-                
+                loadNotifications();
+
             } catch (error) {
                 console.error('Errore:', error);
                 displayMessage('notifiche-message', 'error', '❌ Errore: ' + error.message);
@@ -1405,18 +1324,12 @@
             }
         });
 
-        // Carica la lista delle notifiche
         async function loadNotifications() {
             const container = document.getElementById('notifications-list');
             container.innerHTML = '<div class="loading">⏳ Caricamento notifiche...</div>';
 
             try {
-                const { data, error } = await supabase
-                    .from('csirtnotifications')
-                    .select(`*, csirtincidents(title)`) // Solo il titolo è sufficiente per il JOIN
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
+                const data = await apiRequest('/notifications');
 
                 if (!data || data.length === 0) {
                     container.innerHTML = `<div class="empty-state">Nessuna notifica trovata.</div>`;
@@ -1453,21 +1366,9 @@
             }
         }
 
-        // =================================================================
-        // === GESTIONE UTENTI ===
-        // =================================================================
-
-        // Carica aziende per form utenti (rimane come prima)
         async function loadCompaniesForUserForm() {
             try {
-                // Admin deve vedere tutte le aziende per associare l'utente
-                const { data, error } = await supabase
-                    .from('csirtcompanies')
-                    .select('id, name')
-                    .order('name');
-
-                if (error) throw error;
-
+                const data = await apiRequest('/companies');
                 const select = document.getElementById('new_user_company');
                 select.innerHTML = '<option value="">Nessuna (per Admin/CSIRT)</option>';
                 (data || []).forEach(company => {
@@ -1479,16 +1380,14 @@
             }
         }
 
-        // Mostra/nascondi campo azienda in base al ruolo (rimane come prima)
         document.getElementById('new_user_role').addEventListener('change', function() {
             const companyField = document.getElementById('user-company-field');
             companyField.style.display = this.value === 'company' ? 'block' : 'none';
         });
 
-        // Form Gestione Utenti (Creazione Utenti - solo Admin)
         document.getElementById('utenti-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             if (currentUser.role !== 'admin') {
                 displayMessage('utenti-message', 'error', 'Solo gli Admin possono creare utenti');
                 return;
@@ -1499,31 +1398,18 @@
             submitBtn.textContent = '⏳ Creazione...';
 
             try {
-                const email = document.getElementById('new_user_email').value;
-                const password = document.getElementById('new_user_password').value;
-                const name = document.getElementById('new_user_name').value;
-                const role = document.getElementById('new_user_role').value;
-                const company_id = document.getElementById('new_user_company').value || null;
-                
-                const { data: authData, error: authError } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                       data: { full_name: name }
-                    }
+                const payload = {
+                    email: document.getElementById('new_user_email').value,
+                    password: document.getElementById('new_user_password').value,
+                    name: document.getElementById('new_user_name').value,
+                    role: document.getElementById('new_user_role').value,
+                    company_id: document.getElementById('new_user_company').value || null
+                };
+
+                await apiRequest('/users', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
                 });
-
-                if (authError) throw authError;
-
-                const userId = authData.user.id;
-
-                const { error: profileError } = await supabase
-                    .from('profiles')
-                    .insert([
-                        { id: userId, name: name, role: role, company_id: company_id }
-                    ]);
-                    
-                if (profileError) throw profileError;
 
                 displayMessage('utenti-message', 'success', '✅ Utente creato con successo!');
                 e.target.reset();
@@ -1538,24 +1424,18 @@
             }
         });
 
-        // Carica lista utenti (con JOIN su profiles e companies)
         async function loadUsers() {
             const container = document.getElementById('users-list');
             container.innerHTML = '<div class="loading">⏳ Caricamento...</div>';
 
             try {
-                const { data: profiles, error } = await supabase
-                    .from('profiles')
-                    .select(`*, csirtcompanies(name)`)
-                    .order('created_at', { ascending: false });
+                const profiles = await apiRequest('/users');
 
-                if (error) throw error;
-                
                 if (!profiles || profiles.length === 0) {
                     container.innerHTML = '<p style="text-align: center; color: #999;">Nessun utente</p>';
                     return;
                 }
-                
+
                 container.innerHTML = `
                     <div style="overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse;">
