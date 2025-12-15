@@ -17,10 +17,13 @@ const publicPath = __dirname;
 app.use(express.static(distPath));
 app.use(express.static(publicPath));
 
+// Valori letti dal file .env nella root del progetto (non inserire le chiavi direttamente qui).
 const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error('SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY devono essere configurate nelle variabili di ambiente');
+  throw new Error(
+    'SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY devono essere configurate nelle variabili di ambiente (.env nella root)'
+  );
 }
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);

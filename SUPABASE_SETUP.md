@@ -2,6 +2,19 @@
 
 Questi passaggi spiegano dove creare gli utenti di prova indicati nel login (Admin, Referente CSIRT, Referente Aziendale) usando Supabase.
 
+## 0. Configurare le chiavi Supabase nel backend
+1. Recupera l'URL del progetto e la **Service role key** da **Settings → API → Project API keys** nella dashboard Supabase.
+2. Crea un file `.env` nella radice del progetto (puoi copiare `.env.example`) e incolla i valori:
+   ```env
+   SUPABASE_URL=https://<your-project>.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+   ```
+   > Non serve modificare `server.js`: le chiavi vengono lette automaticamente dal file `.env` grazie a `dotenv`.
+3. Avvia l'app con `npm start` (usa questo comando anche in locale: **non** usare solo `npm run dev`, perché il proxy `/api` verrebbe mancato e il login risponderebbe con "Errore di rete").
+4. Riavvia `npm start` (o il processo del server Node) dopo ogni modifica alle variabili di ambiente.
+
+> **Nota:** queste chiavi non devono essere esposte lato browser; restano solo nel backend `server.js`.
+
 ## 1. Creare gli utenti in Supabase Auth
 1. Apri la dashboard Supabase del progetto.
 2. Vai su **Authentication → Users**.
