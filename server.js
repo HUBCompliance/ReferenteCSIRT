@@ -25,6 +25,20 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+app.get('/api/health', async (_req, res) => {
+  try {
+    const { data, error } = await supabase.from('profiles').select('id').limit(1);
+
+    if (error) {
+      return res.status(500).json({ status: 'error', details: error.message });
+    }
+
+    res.json({ status: 'ok', supabase: true, profilesSeeded: Boolean(data?.length) });
+  } catch (err) {
+    res.status(500).json({ status: 'error', details: err.message });
+  }
+});
+
 const ACL = {
   admin: {
     csirtcompanies: ['select', 'upsert'],
