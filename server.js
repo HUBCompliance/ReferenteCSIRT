@@ -197,16 +197,16 @@ app.post('/api/designations', requireAuth, async (req, res) => {
 });
 
 app.post('/api/configurations', requireAuth, async (req, res) => {
-  ensureAcl(req.profile, 'csirtnetwork_configuration', 'upsert');
-
-  const company_id = resolveCompanyIdForWrite(req.profile, req.body.company_id);
-  if (!company_id) {
-    return res.status(400).json({ error: 'company_id obbligatorio' });
-  }
-
-  const configData = { ...req.body, company_id };
-
   try {
+    ensureAcl(req.profile, 'csirtnetwork_configuration', 'upsert');
+
+    const company_id = resolveCompanyIdForWrite(req.profile, req.body.company_id);
+    if (!company_id) {
+      return res.status(400).json({ error: 'company_id obbligatorio' });
+    }
+
+    const configData = { ...req.body, company_id };
+
     const { error } = await supabase
       .from('csirtnetwork_configuration')
       .upsert(configData, { onConflict: 'company_id' });
@@ -215,30 +215,28 @@ app.post('/api/configurations', requireAuth, async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
 app.post('/api/incidents', requireAuth, async (req, res) => {
-  ensureAcl(req.profile, 'csirtincidents', 'insert');
-
-  const company_id = resolveCompanyIdForWrite(req.profile, req.body.company_id);
-  if (!company_id) {
-    return res.status(400).json({ error: 'company_id obbligatorio' });
-  }
-
-  const incidentData = { ...req.body, company_id, created_by: req.authUser.id };
-
   try {
-    const { error } = await supabase
-      .from('csirtincidents')
-      .insert([incidentData]);
+    ensureAcl(req.profile, 'csirtincidents', 'insert');
+
+    const company_id = resolveCompanyIdForWrite(req.profile, req.body.company_id);
+    if (!company_id) {
+      return res.status(400).json({ error: 'company_id obbligatorio' });
+    }
+
+    const incidentData = { ...req.body, company_id, created_by: req.authUser.id };
+
+    const { error } = await supabase.from('csirtincidents').insert([incidentData]);
 
     if (error) throw error;
 
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(err.status || 500).json({ error: err.message });
   }
 });
 
@@ -273,9 +271,9 @@ app.use((req, res, next) => {
 });
 
 app.post('/api/notifications', requireAuth, async (req, res) => {
-  ensureAcl(req.profile, 'csirtnotifications', 'insert');
-
   try {
+    ensureAcl(req.profile, 'csirtnotifications', 'insert');
+
     const { data: incident, error: incidentError } = await supabase
       .from('csirtincidents')
       .select('company_id')
@@ -371,6 +369,11 @@ app.post('/api/users', requireAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.use((err, req, res, next) => {
+  console.error('Errore non gestito:', err);
+  res.status(err.status || 500).json({ error: err.message || 'Errore interno del server' });
 });
 
 const PORT = process.env.PORT || 3000;
