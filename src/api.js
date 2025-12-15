@@ -39,8 +39,9 @@ export async function checkBackendHealth() {
     }
     return response.json();
   } catch (error) {
+    const reason = error?.message ? ` Dettaglio: ${error.message}` : '';
     throw new Error(
-      'Backend non raggiungibile. Avvia il server Node (npm start) e verifica le variabili Supabase nel file .env.',
+      `Backend non raggiungibile. Avvia il server Node (npm start), verifica il proxy /api e le variabili Supabase nel file .env.${reason}`,
       { cause: error },
     );
   }
@@ -60,7 +61,13 @@ export async function apiRequest(path, options = {}) {
     throw new Error('Impossibile contattare il server. Controlla la connessione o che il proxy backend sia attivo.');
   }
 
-  const payload = await response.json().catch(() => ({}));
+  const rawBody = await response.text();
+  let payload = {};
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : {};
+  } catch (_parseError) {
+    payload = {};
+  }
 
   if (response.status === 401) {
     if (unauthorizedHandler) {
@@ -70,7 +77,13 @@ export async function apiRequest(path, options = {}) {
   }
 
   if (!response.ok) {
-    throw new Error(payload.error || 'Errore di rete');
+    const statusLabel = response.status ? ` (HTTP ${response.status})` : '';
+    const fallback =
+      response.status === 404
+        ? 'Endpoint /api non trovato. Avvia il server backend con "npm start" (non usare solo "npm run dev").'
+        : 'Errore di rete';
+    const details = payload.error || payload.message || payload.details || rawBody || fallback;
+    throw new Error(`${details}${statusLabel}`);
   }
 
   return payload;

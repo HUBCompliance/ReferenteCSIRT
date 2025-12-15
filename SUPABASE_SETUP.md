@@ -9,7 +9,8 @@ Questi passaggi spiegano dove creare gli utenti di prova indicati nel login (Adm
    SUPABASE_URL=https://<your-project>.supabase.co
    SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
    ```
-3. Riavvia `npm start` (o il processo del server Node) dopo ogni modifica alle variabili di ambiente.
+3. Avvia l'app con `npm start` (usa questo comando anche in locale: **non** usare solo `npm run dev`, perché il proxy `/api` verrebbe mancato e il login risponderebbe con "Errore di rete").
+4. Riavvia `npm start` (o il processo del server Node) dopo ogni modifica alle variabili di ambiente.
 
 > **Nota:** queste chiavi non devono essere esposte lato browser; restano solo nel backend `server.js`.
 
